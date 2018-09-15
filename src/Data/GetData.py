@@ -10,7 +10,7 @@ with open(urls_path, 'r') as urls:
             i += 1
         else:
             break
-os.system('yes yes | unzip "*.zip"')
+os.system('yes "yes"| unzip "*.zip"')
 # for logfile in glob("*.csv"):
 #     print(logfile)
 #     os.sytem('aws s3 mv logfile s3://my-insight-data/logfiles2016/')
