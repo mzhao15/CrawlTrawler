@@ -9,7 +9,7 @@ with open(urls_path, 'r') as urls:
             os.system('wget ' + url.strip())
             url_split = url.split('/')
             filename = url_split[-1]
-            os.system('yes | unzip' + filename)
+            os.system('yes | unzip ' + filename)
             i += 1
         else:
             break
