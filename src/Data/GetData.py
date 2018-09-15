@@ -13,6 +13,6 @@ with open(urls_path, 'r') as urls:
             i += 1
         else:
             break
-# for logfile in glob("*.csv"):
-#     print(logfile)
-#     os.sytem('aws s3 mv logfile s3://my-insight-data/logfiles2016/')
+for logfile in glob("*.csv"):
+    os.sytem('aws s3 mv logfile s3://my-insight-data/logfiles2016/')
+    print('sending csv file to s3')
