@@ -14,5 +14,5 @@ with open(urls_path, 'r') as urls:
         else:
             break
 for logfile in glob("*.csv"):
-    os.sytem('aws s3 mv logfile s3://my-insight-data/logfiles2016/')
+    os.system('aws s3 mv logfile s3://my-insight-data/logfiles2016/')
     print('sending csv file to s3')
