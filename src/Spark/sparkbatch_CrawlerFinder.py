@@ -1,7 +1,8 @@
 from pyspark import SparkContext
 import psycopg2
+from psycopg2 import extras
 from params import pql_params
-# from psycopg2 import extras
+from datetime import datetime, time, timedelta
 
 '''
 this batch job is to identify the web crawler robot IPs
@@ -21,13 +22,13 @@ class CrawlerIPFinder:
             print('cannot connect to PostgreSQL database\n')
             print(str(er1))
 
-        self.cur = self.db_conn.cursor()
+        self.cur = self.db_conn.cursor(cursor_factory=extras.DictCursor)
         self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS table_robot_ip (ip varchar(80), \
+            "CREATE TABLE IF NOT EXISTS table_robot_ip (id serial PRIMARY KEY, \
+                                                        ip varchar(80), \
                                                         detected_num int, \
                                                         detected_date date, \
-                                                        flag int, \
-                                                        PRIMARY KEY (ip, detected_date, flag));")
+                                                        flag int);")
 
     def get_totaldownloadpermin(self):
         '''
@@ -61,30 +62,86 @@ class CrawlerIPFinder:
             .reduceByKey(lambda v1, v2: v1+v2) \
             .filter(lambda count: count[1] > 500)
 
-    def insert(self, records, flag):
+    def insertIPs(self, records, flag):
         ''' insert the record if not exists'''
+        new_records = []
         for record in records:
-            # self.cur.execute("SELECT ip FROM table_robot_ip WHERE ip=%s", (record[0],))
-            # if not self.cur.fetchall():
-            self.cur.execute("INSERT INTO table_robot_ip VALUES(%s, %s, %s, %s) \
-                             ON CONFLICT(ip, detected_date, flag) DO NOTHING;",
-                             (record[0], record[1], self.date, flag))
-        return
+            new_records.append((record[0], record[1], self.date, flag))
+            # self.cur.execute("INSERT INTO table_robot_ip(ip, detected_num, detected_date, flag) \
+            #                 VALUES(%s, %s, %s, %s);", (record[0], record[1], self.date, flag))
+        self.cur.execute(
+            "PREPARE insertIPs AS INSERT INTO table_robot_ip (ip, detected_num, detected_date, flag) \
+            VALUES ($1, $2, $3, $4);")
+        extras.execute_batch(self.cur, "EXECUTE insertIPs (%s, %s, %s, %s)", new_records)
+        self.cur.execute("DEALLOCATE insertIPs")
+        self.db_conn.commit()
+
+    def deleteIPs(self):
+        '''remove robot IPs which have not been active for more than 30 days'''
+        tdy = datetime.strptime(self.date, '%Y-%m-%d')
+        checkday = tdy - timedelta(days=30)
+        self.cur.execute("SELECT id, ip FROM table_robot_ip WHERE detected_date=%s;", (checkday,))
+        records = self.cur.fetchall()
+        if not records:
+            '''the first 30 days'''
+            return
+        self.cur.execute("SELECT ip FROM table_robot_ip WHERE detected_date>%s;", (checkday,))
+        new_records = self.cur.fetchall()
+        ips = []  # list of ips deteted after the check day
+        for record in new_records:
+            if record['ip'] not in ips:
+                ips.append(record['ip'])
+        delete_list = []  # list of ips need to be deleted
+        for i in range(len(records)):
+            if records[i]['ip'] not in ips:
+                delete_list.append(records[i]['id'])
+        self.cur.execute('DELETE FROM table_robot_ip WHERE id IN %s', (tuple(delete_list),))
+        self.db_conn.commit()
+
+    # def get_totaldownloadpermin(self):
+        # '''sliding window to find the robot IPs'''
+        # def insert(records):
+        #     tempdb_conn = psycopg2.connect(**pql_params)
+        #     tempcur = tempdb_conn.cursor()
+        #     tempcur.execute(
+        #         "PREPARE stmt AS INSERT INTO table_robot_ip (ip, detected_num) VALUES ($1, $2);")
+        #     extras.execute_batch(tempcur, "EXECUTE stmt (%s, %s)", records)
+        #     tempcur.execute("DEALLOCATE stmt")
+        #     tempdb_conn.commit()
+        #     tempcur.close()
+        #     tempdb_conn.close()
+        # ip_list = []
+        # windowstart = datetime.combine(datetime.strptime(self.date, '%Y-%m-%d'), time(0, 0, 0))
+        # # tomorrow = windowstart + timedelta(days=1)
+        # tomorrow = datetime(2016, 1, 1, 1, 0, 0)
+        # # 'ip', '2016-01-01 00:00:00'
+        # parsed_data = self.data.map(lambda x: (x[0], datetime.strptime(
+        #     ' '.join((x[1], x[2])), '%Y-%m-%d %H:%M:%S')))
+        # windowend = windowstart + timedelta(seconds=10)
+        # while windowend <= tomorrow:
+        #     records = parsed_data.filter(lambda x: x[1] >= windowstart and x[1]
+        #                                  <= windowend).map(lambda x: (x[0], 1)) \
+        #         .reduceByKey(lambda v1, v2: v1+v2) \
+        #         .filter(lambda count: count[1] > 25).collect()
+        #     ip_list.extend(records)
+        #     windowstart = windowstart + timedelta(seconds=1)
+        #     windowend = windowstart + timedelta(seconds=10)
+        # return
 
     def saveIPs(self):
         '''
         save all the detected robot IPs to datases with flags
         need to update the database based on the retention time
         '''
+        # self.get_totaldownloadpermin()
+        self.deleteIPs()  # clear not active robot IPs
         records = self.get_totalcompanypermin().collect()
-        self.insert(records, flag=0)
-        records = self.get_totaldownloadpermin().collect()  # foreachPartition(func_inserts)
-        self.insert(records, flag=1)
+        self.insertIPs(records, flag=0)
+        records = self.get_totaldownloadpermin().collect()
+        self.insertIPs(records, flag=1)
         records = self.get_totaldownloadperday().collect()
-        self.insert(records, flag=2)
+        self.insertIPs(records, flag=2)
 
-        # cur.execute("DEALLOCATE inserts")
-        self.db_conn.commit()
         self.cur.close()
         self.db_conn.close()
         return
