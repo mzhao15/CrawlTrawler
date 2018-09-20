@@ -1,10 +1,12 @@
 #!/bin/bash
 
 FOLDER=$AIRFLOW_HOME/dags
-FILE = scheduler.py
+FILE=scheduler.py
 
-if [ ! -d $FOLDER]; then
+if [ ! -d $FOLDER ]; then
+
     mkdir $FOLDER
+
 fi
 
 cp $FILE $FOLDER/
