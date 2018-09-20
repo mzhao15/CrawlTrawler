@@ -68,8 +68,7 @@ class CrawlerIPFinder:
         new_records = []
         for record in records:
             new_records.append((record[0], record[1], self.date, flag))
-            # self.cur.execute("INSERT INTO table_robot_ip(ip, detected_num, detected_date, flag) \
-            #                 VALUES(%s, %s, %s, %s);", (record[0], record[1], self.date, flag))
+
         self.cur.execute(
             "PREPARE insertIPs AS INSERT INTO table_robot_ip (ip, detected_num, detected_date, flag) \
             VALUES ($1, $2, $3, $4);")
@@ -99,49 +98,49 @@ class CrawlerIPFinder:
         self.cur.execute('DELETE FROM table_robot_ip WHERE id IN %s', (tuple(delete_list),))
         self.db_conn.commit()
 
-    # def get_totaldownloadpermin2(self):
-    #     '''sliding window to find the robot IPs'''
-    #     def insert(records):
-    #         tempdb_conn = psycopg2.connect(**pql_params)
-    #         tempcur = tempdb_conn.cursor()
-    #         tempcur.execute(
-    #             "PREPARE stmt AS INSERT INTO table_robot_ip (ip, detected_num) VALUES ($1, $2);")
-    #         extras.execute_batch(tempcur, "EXECUTE stmt (%s, %s)", records)
-    #         tempcur.execute("DEALLOCATE stmt")
-    #         tempdb_conn.commit()
-    #         tempcur.close()
-    #         tempdb_conn.close()
-    #     ip_list = []
-    #     windowstart = datetime.combine(datetime.strptime(self.date, '%Y-%m-%d'), time(0, 0, 0))
-    #     # tomorrow = windowstart + timedelta(days=1)
-    #     tomorrow = datetime(2016, 1, 1, 1, 0, 0)
-    #     # 'ip', '2016-01-01 00:00:00'
-    #     parsed_data = self.data.map(lambda x: (x[0], datetime.strptime(
-    #         ' '.join((x[1], x[2])), '%Y-%m-%d %H:%M:%S')))
-    #     windowend = windowstart + timedelta(seconds=10)
-    #     while windowend <= tomorrow:
-    #         records = parsed_data.filter(lambda x: x[1] >= windowstart and x[1]
-    #                                      <= windowend).map(lambda x: (x[0], 1)) \
-    #             .reduceByKey(lambda v1, v2: v1+v2) \
-    #             .filter(lambda count: count[1] > 25).collect()
-    #         ip_list.extend(records)
-    #         windowstart = windowstart + timedelta(seconds=1)
-    #         windowend = windowstart + timedelta(seconds=10)
-    #     return
+    def get_totaldownloadpermin2(self):
+        '''sliding window to find the robot IPs'''
+        def insert(records):
+            tempdb_conn = psycopg2.connect(**pql_params)
+            tempcur = tempdb_conn.cursor()
+            tempcur.execute(
+                "PREPARE stmt AS INSERT INTO table_robot_ip (ip, detected_num) VALUES ($1, $2);")
+            extras.execute_batch(tempcur, "EXECUTE stmt (%s, %s)", records)
+            tempcur.execute("DEALLOCATE stmt")
+            tempdb_conn.commit()
+            tempcur.close()
+            tempdb_conn.close()
+        ip_list = []
+        windowstart = datetime.combine(datetime.strptime(self.date, '%Y-%m-%d'), time(0, 0, 0))
+        # tomorrow = windowstart + timedelta(days=1)
+        tomorrow = datetime(2016, 1, 1, 1, 0, 0)
+        # 'ip', '2016-01-01 00:00:00'
+        parsed_data = self.data.map(lambda x: (x[0], datetime.strptime(
+            ' '.join((x[1], x[2])), '%Y-%m-%d %H:%M:%S')))
+        windowend = windowstart + timedelta(seconds=10)
+        while windowend <= tomorrow:
+            records = parsed_data.filter(lambda x: x[1] >= windowstart and x[1]
+                                         <= windowend).map(lambda x: (x[0], 1)) \
+                .reduceByKey(lambda v1, v2: v1+v2) \
+                .filter(lambda count: count[1] > 25).collect()
+            ip_list.extend(records)
+            windowstart = windowstart + timedelta(seconds=1)
+            windowend = windowstart + timedelta(seconds=10)
+        return
 
     def run(self):
         '''
         save all the detected robot IPs to datases with flags
         need to update the database based on the retention time
         '''
-        # self.get_totaldownloadpermin2()
-        self.deleteIPs()  # clear not active robot IPs
-        records = self.get_totalcompanypermin().collect()
-        self.insertIPs(records, flag=0)
-        records = self.get_totaldownloadpermin().collect()
-        self.insertIPs(records, flag=1)
-        records = self.get_totaldownloadperday().collect()
-        self.insertIPs(records, flag=2)
+        self.get_totaldownloadpermin2()
+        # self.deleteIPs()  # clear not active robot IPs
+        # records = self.get_totalcompanypermin().collect()
+        # self.insertIPs(records, flag=0)
+        # records = self.get_totaldownloadpermin().collect()
+        # self.insertIPs(records, flag=1)
+        # records = self.get_totaldownloadperday().collect()
+        # self.insertIPs(records, flag=2)
 
         self.cur.close()
         self.db_conn.close()

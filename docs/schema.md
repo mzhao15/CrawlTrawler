@@ -1,11 +1,11 @@
 PostgreSQL table schemas
 
-1. table_robot_ip(  
+1. table_robot_ip(
+    id: serial PRIMARY KEY,  
     ip: varchar(80),  
     detected_num: int,  
     detected_date: yy-mm-dd,  
-    flag: int,  
-    primary key(ip, detected_date, flag)  
+    flag: int
 )  
 
     flag:  

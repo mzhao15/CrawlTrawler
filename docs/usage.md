@@ -26,7 +26,7 @@ Run spark jobs on cluster assuming necessary packages have been installed on clu
 
 
 Connect to rds PostgreSQL database:  
-    >1. pip install psycopg2  
-    >2. find all the connection parameters: master-username, password, endpoint, port (5432)  
-    >3. make sure security group allows visits  
-    >4. remember to commit after create, update, insert ...
+    1. pip install psycopg2  
+    2. find all the connection parameters: master-username, password, endpoint, port (5432)  
+    3. make sure security group allows visits  
+    4. remember to commit after create, update, insert ...

@@ -46,7 +46,7 @@ class CountVisits:
             .map(lambda count: (count[0][0], count[0][1], count[1]))
         # return visit_date, cik, num_of_visits
 
-    def saveVisits(self):
+    def run(self):
         ''' get the number of visits by human and robot to each company'''
         filters = self.robot_ip_list
         counts = self.counter(self.data.filter(lambda line: line[0] not in filters)).collect()
@@ -63,4 +63,4 @@ class CountVisits:
 if __name__ == '__main__':
     data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
     visits = CountVisits(data_path)
-    visits.saveVisits()
+    visits.run()
