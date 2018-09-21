@@ -5,6 +5,7 @@ from params import pql_params
 
 '''
 this batch job is to get the number of visits by human and robot to each company
+argument (date of the log file), example: 2016-01-01
 '''
 
 
@@ -61,6 +62,14 @@ class CountVisits:
 
 
 if __name__ == '__main__':
-    data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
+    # get the folder name and filename
+    if len(argv) > 2:
+        print('too many arguments\n')
+        return
+    year, month, day = sys.argv[1].split('-')
+    foldername = 'logfiles' + year
+    filename = 'log' + ''.join((year,month,day)) + '.csv'
+    # data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
+    data_path = 's3a://my-insight-data/' + foldername + '/' + filename
     visits = CountVisits(data_path)
     visits.run()
