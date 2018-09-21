@@ -1,0 +1,24 @@
+Install Apache Airflow:
+# add the following in .bashrc
+    export AIRFLOW_HOME=~/airflow
+# execute to install Airflow
+    pip install apache-airflow
+# check installation
+    airflow version
+
+# change the default timezone in "airflow.cfg":
+    default_timezone = est
+
+
+Run airflow DAGs:
+# move the python scripts to $AIRFLOW_HOME/dags/
+# execute the python script
+    python example.py
+# initialize the databases, init sqlite file
+    airflow initdb
+# launch webserver
+    airflow webserver -p 8081
+# launch scheduler, actual executor
+    airflow scheduler
+# go to the webUI, http://localhost:8081
+# enable the dag (on the left) and then execute it on the most left button on the small menu with the ‘play’ icon
