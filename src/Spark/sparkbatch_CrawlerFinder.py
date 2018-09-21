@@ -159,6 +159,5 @@ if __name__ == "__main__":
     filename = 'log' + ''.join((year, month, day)) + '.csv'
     # data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
     data_path = 's3a://my-insight-data/' + foldername + '/' + filename
-    print(data_path)
     finder = CrawlerIPFinder(data_path)
     finder.run()
