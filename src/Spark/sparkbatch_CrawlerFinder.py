@@ -153,6 +153,7 @@ if __name__ == "__main__":
     # get the folder name and filename
     if len(sys.argv) > 2:
         print('too many arguments\n')
+        exit()
     year, month, day = sys.argv[1].split('-')
     foldername = 'logfiles' + year
     filename = 'log' + ''.join((year, month, day)) + '.csv'

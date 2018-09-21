@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd /usr/local/spark/bin/
+cd src/Spark/
 
 ./CrawlerFinder.sh

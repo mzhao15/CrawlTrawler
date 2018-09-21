@@ -31,7 +31,7 @@ while taskdate < datetime(2017, 1, 1).date():
     '''
     task1 = BashOperator(
         task_id='finding_{}'.format(taskdate),
-        bash_command='cd /usr/local/spark/bin/; ./CrawlerFinder.sh {}'.format(taskdate),
+        bash_command='cd ../Spark/; ./CrawlerFinder.sh {}'.format(taskdate),
         dag=dag)
 
     if parent:
@@ -39,7 +39,7 @@ while taskdate < datetime(2017, 1, 1).date():
 
     task2 = BashOperator(
         task_id='counting_{}'.format(taskdate),
-        bash_command='cd /usr/local/spark/bin/; ./Total.sh {}'.format(taskdate),
+        bash_command='cd ../Spark/; ./Total.sh {}'.format(taskdate),
         dag=dag)
 
     # task2 executes only after task1 is completed
