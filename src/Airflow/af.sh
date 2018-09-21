@@ -14,4 +14,4 @@ python $FOLDER/$FILE
 
 airflow initdb
 airflow webserver -p 8081
-airflow scheduler
+#airflow scheduler
