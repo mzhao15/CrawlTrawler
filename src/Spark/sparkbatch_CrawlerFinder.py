@@ -151,12 +151,11 @@ class CrawlerIPFinder:
 
 if __name__ == "__main__":
     # get the folder name and filename
-    if len(argv) > 2:
+    if len(sys.argv) > 2:
         print('too many arguments\n')
-        return
     year, month, day = sys.argv[1].split('-')
     foldername = 'logfiles' + year
-    filename = 'log' + ''.join((year,month,day)) + '.csv'
+    filename = 'log' + ''.join((year, month, day)) + '.csv'
     # data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
     data_path = 's3a://my-insight-data/' + foldername + '/' + filename
     finder = CrawlerIPFinder(data_path)
