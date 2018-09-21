@@ -2,11 +2,15 @@
 from datetime import datetime, timedelta, time
 
 
-day = '2016-01-01'
-tt = '00:00:00'
-half = tt[0:5]
-print(half)
+day1 = datetime(2016, 1, 1)
+# print(day1)
+print('today is {}'.format(day1.date()))
+date = day1.date()
+print(date)
+date2 = date + timedelta(days=1)
+print(date2)
 
+day = '2016-01-01'
 dday = datetime.strptime(day, '%Y-%m-%d')
 dday = dday.date()
 # print(dday)
@@ -15,18 +19,13 @@ day2 = tday + timedelta(days=2)
 day3 = tday - timedelta(days=2)
 # print(day3)
 
-# diff = tday - dday
-# print(diff.days)
-
 datelist = [tday, day2, day3, dday]
 newdatelist = sorted(datelist)
-# for i in range(len(newdatelist)):
-#     print(newdatelist[i])
 
 time0 = datetime.combine(datetime.strptime('2016-01-01', '%Y-%m-%d'), time(0, 0, 0))
 # print(type(time0))
 time1 = time0 - timedelta(days=30)
-print(time1)
+# print(time1)
 
 time2 = time0 + timedelta(days=1)
 # print(time2)
@@ -39,5 +38,3 @@ realsometime = datetime.strptime(sometime, '%Y-%m-%d %H:%M:%S')
 # print(type(realsometime))
 strtime = realsometime.strftime("%Y-%m-%d %H:%M:%S")
 # print(type(strtime))
-#
-# print(datetime(2016, 1, 1, 5, 5, 5))

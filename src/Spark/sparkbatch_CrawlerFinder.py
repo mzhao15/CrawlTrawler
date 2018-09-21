@@ -133,14 +133,14 @@ class CrawlerIPFinder:
         save all the detected robot IPs to datases with flags
         need to update the database based on the retention time
         '''
-        self.get_totaldownloadpermin2()
-        # self.deleteIPs()  # clear not active robot IPs
-        # records = self.get_totalcompanypermin().collect()
-        # self.insertIPs(records, flag=0)
-        # records = self.get_totaldownloadpermin().collect()
-        # self.insertIPs(records, flag=1)
-        # records = self.get_totaldownloadperday().collect()
-        # self.insertIPs(records, flag=2)
+        # self.get_totaldownloadpermin2()
+        self.deleteIPs()  # clear not active robot IPs
+        records = self.get_totalcompanypermin().collect()
+        self.insertIPs(records, flag=0)
+        records = self.get_totaldownloadpermin().collect()
+        self.insertIPs(records, flag=1)
+        records = self.get_totaldownloadperday().collect()
+        self.insertIPs(records, flag=2)
 
         self.cur.close()
         self.db_conn.close()
