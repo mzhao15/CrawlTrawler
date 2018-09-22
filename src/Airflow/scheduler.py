@@ -23,6 +23,15 @@ default_args = {
 # schedule_interval=None
 dag = DAG('test_scheduler', default_args=default_args, schedule_interval=timedelta(minutes=2))
 
+command1 = """
+cd ../Spark/
+./CrawlerFinder.sh {{params.taskdate}}
+"""
+command2 = """
+cd ../Spark/
+./Total.sh {{params.taskdate}}
+"""
+
 parent = None
 taskdate = datetime(2016, 1, 1).date()
 while taskdate < datetime(2016, 1, 3).date():
@@ -31,7 +40,8 @@ while taskdate < datetime(2016, 1, 3).date():
     '''
     task1 = BashOperator(
         task_id='finding_{}'.format(taskdate),
-        bash_command='cd ../Spark/; ./CrawlerFinder.sh {}'.format(taskdate),
+        bash_command='cd ../Spark/; ./CrawlerFinder.sh {{params.taskdate}}',
+        params={'taskdate': str(taskdate)},
         dag=dag)
 
     if parent:
@@ -39,7 +49,8 @@ while taskdate < datetime(2016, 1, 3).date():
 
     task2 = BashOperator(
         task_id='counting_{}'.format(taskdate),
-        bash_command='cd ../Spark/; ./Total.sh {}'.format(taskdate),
+        bash_command='cd ../Spark/; ./Total.sh {{params.taskdate}}',
+        params={'taskdate': str(taskdate)},
         dag=dag)
 
     # task2 executes only after task1 is completed
