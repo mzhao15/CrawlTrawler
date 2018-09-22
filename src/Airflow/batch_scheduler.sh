@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FOLDER=$AIRFLOW_HOME/dags
-FILE=scheduler.py
+FILE=batch_scheduler.py
 
 if [ ! -d $FOLDER ]; then
 

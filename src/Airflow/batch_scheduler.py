@@ -11,7 +11,7 @@ default_args = {
     'email': ['cliffish0408@gmail.com'],
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 2,
     'retry_delay': timedelta(minutes=1),
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
@@ -23,14 +23,6 @@ default_args = {
 # schedule_interval=None
 dag = DAG('test_scheduler', default_args=default_args, schedule_interval=timedelta(minutes=2))
 
-command1 = """
-cd ../Spark/
-./CrawlerFinder.sh {{params.taskdate}}
-"""
-command2 = """
-cd ../Spark/
-./Total.sh {{params.taskdate}}
-"""
 
 parent = None
 taskdate = datetime(2016, 1, 1).date()
