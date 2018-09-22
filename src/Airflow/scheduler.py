@@ -25,7 +25,7 @@ dag = DAG('test_scheduler', default_args=default_args, schedule_interval=timedel
 
 parent = None
 taskdate = datetime(2016, 1, 1).date()
-while taskdate < datetime(2017, 1, 1).date():
+while taskdate < datetime(2016, 1, 2).date():
     '''
     run the batch processes on a daily base
     '''
@@ -45,6 +45,6 @@ while taskdate < datetime(2017, 1, 1).date():
     # task2 executes only after task1 is completed
     task2.set_upstream(task1)
     # next day relay on the previous day
-    parent = task1
+    parent = task2
     # add one day increment
     taskdate = taskdate + timedelta(days=1)
