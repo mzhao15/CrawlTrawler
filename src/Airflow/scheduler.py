@@ -40,7 +40,7 @@ while taskdate < datetime(2016, 1, 3).date():
     '''
     task1 = BashOperator(
         task_id='finding_{}'.format(taskdate),
-        bash_command='cd ../Spark/; ./CrawlerFinder.sh {{params.taskdate}}',
+        bash_command='cd /home/ubuntu/Insight-Meng/src/Spark/; ./CrawlerFinder.sh {{params.taskdate}}',
         params={'taskdate': str(taskdate)},
         dag=dag)
 
@@ -49,7 +49,7 @@ while taskdate < datetime(2016, 1, 3).date():
 
     task2 = BashOperator(
         task_id='counting_{}'.format(taskdate),
-        bash_command='cd ../Spark/; ./Total.sh {{params.taskdate}}',
+        bash_command='cd /home/ubuntu/Insight-Meng/src/Spark/; ./Total.sh {{params.taskdate}}',
         params={'taskdate': str(taskdate)},
         dag=dag)
 
