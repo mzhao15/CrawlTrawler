@@ -25,7 +25,7 @@ dag = DAG('test_scheduler', default_args=default_args, schedule_interval=timedel
 
 parent = None
 taskdate = datetime(2016, 1, 1).date()
-while taskdate < datetime(2016, 1, 2).date():
+while taskdate < datetime(2016, 1, 3).date():
     '''
     run the batch processes on a daily base
     '''
