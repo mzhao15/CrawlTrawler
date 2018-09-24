@@ -2,4 +2,4 @@
 
 cd src/Spark/
 
-./CrawlerFinder.sh
+./CrawlerFinder.sh $1
