@@ -3,7 +3,7 @@ from pyspark import SparkContext
 from pyspark.sql import SparkSession
 import psycopg2
 from psycopg2 import extras
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from params import pql_params
 
 '''
@@ -29,7 +29,7 @@ class CrawlerIPFinder:
             print(str(er1))
         self.cur = self.db_conn.cursor(cursor_factory=extras.DictCursor)
         self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS table_robot_ip (id serial PRIMARY KEY, \
+            "CREATE TABLE IF NOT EXISTS robot_ip (id serial PRIMARY KEY, \
             detected_date date, \
             ip varchar(20));")
         self.db_conn.commit()
@@ -38,14 +38,6 @@ class CrawlerIPFinder:
         '''
         find IPs which download more than 25 items in one minute
         '''
-        # return self.data.map(lambda line: (line[0], line[1], line[2].split(':'))) \
-        #     .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]))) \
-        #     .map(lambda y: (y[0], '-'.join(y[1]))) \
-        #     .map(lambda z: (','.join(z), 1)) \
-        #     .reduceByKey(lambda v1, v2: v1+v2) \
-        #     .filter(lambda count: count[1] > 25) \
-        #     .map(lambda count: (count[0].split(',')[0], count[1]))
-
         return self.data.map(lambda line: (line[0], line[1], line[2].split(':'))) \
             .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]))) \
             .map(lambda y: (y[0], '-'.join(y[1]))) \
@@ -53,21 +45,21 @@ class CrawlerIPFinder:
             .reduceByKey(lambda v1, v2: v1+v2) \
             .filter(lambda count: count[1] > 25) \
             .map(lambda count: count[0].split(',')) \
-            .map(lambda x: (x[1][:10], x[0])) \
+            .map(lambda x: (x[1][:10], x[0]))
 
+    def get_totaldownloadperday(self):
+        '''
+        find IPs which download more than 500 times in a single day
+        '''
+        return self.data.map(lambda line: (','.join((line[0], line[1])), 1)) \
+            .reduceByKey(lambda v1, v2: v1+v2) \
+            .filter(lambda count: count[1] > 500) \
+            .map(lambda count: (count[0].split(',')[1], count[0].split(',')[0]))
 
     def get_totalcompanypermin(self):
         '''
         find IPs which download items from more than 3 companies in one minute
         '''
-        # return self.data.map(lambda line: (line[0], line[1], line[2].split(':'), line[4])) \
-        #     .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]), x[3])) \
-        #     .map(lambda y: (y[0], '-'.join(y[1]), y[2])) \
-        #     .map(lambda z: (','.join(z), 1)) \
-        #     .reduceByKey(lambda v1, v2: v1+v2) \
-        #     .filter(lambda count: count[1] > 3) \
-        #     .map(lambda count: (count[0].split(',')[0], count[1]))
-
         return self.data.map(lambda line: (line[0], line[1], line[2].split(':'), line[4])) \
             .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]), x[3])) \
             .map(lambda y: (y[0], '-'.join(y[1]), y[2])) \
@@ -78,30 +70,20 @@ class CrawlerIPFinder:
             .map(lambda x: (x[1][:10], x[0])) \
 
 
-    def get_totaldownloadperday(self):
-        '''
-        find IPs which download more than 500 times in a single day
-        '''
-        # return self.data.map(lambda line: (line[0], 1)) \
-        #     .reduceByKey(lambda v1, v2: v1+v2) \
-        #     .filter(lambda count: count[1] > 500) \
-
-        return self.data.map(lambda line: (','.join((line[0], line[1])), 1)) \
-            .reduceByKey(lambda v1, v2: v1+v2) \
-            .filter(lambda count: count[1] > 500) \
-            .map(lambda count: (count[0].split(',')[1], count[0].split(',')[0])) \
-
+    def closedb(self):
+        self.cur.close()
+        self.db_conn.close()
 
     def deleteIPs(self):
         '''remove robot IPs which have not been active for more than 30 days'''
         tdy = datetime.strptime(self.date, '%Y-%m-%d')
         checkday = tdy - timedelta(days=30)
-        self.cur.execute("SELECT id, ip FROM table_robot_ip WHERE detected_date=%s;", (checkday,))
+        self.cur.execute("SELECT id, ip FROM robot_ip WHERE detected_date=%s;", (checkday,))
         records = self.cur.fetchall()
         if not records:
             '''the first 30 days'''
             return
-        self.cur.execute("SELECT ip FROM table_robot_ip WHERE detected_date>%s;", (checkday,))
+        self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date>%s;", (checkday,))
         new_records = self.cur.fetchall()
         ips = []  # list of ips deteted after the check day
         for record in new_records:
@@ -111,7 +93,9 @@ class CrawlerIPFinder:
         for i in range(len(records)):
             if records[i]['ip'] not in ips:
                 delete_list.append(records[i]['id'])
-        self.cur.execute('DELETE FROM table_robot_ip WHERE id IN %s', (tuple(delete_list),))
+        self.cur.execute('DELETE FROM robot_ip WHERE id IN %s', (tuple(delete_list),))
+        # delete IPs which were detected more than 30 days ago
+        self.cur.execute('DELETE FROM robot_ip WHERE detected_date<%s', (checkday,))
         self.db_conn.commit()
         self.closedb()
 
@@ -121,7 +105,7 @@ class CrawlerIPFinder:
     #         tempdb_conn = psycopg2.connect(**pql_params)
     #         tempcur = tempdb_conn.cursor()
     #         tempcur.execute(
-    #             "PREPARE stmt AS INSERT INTO table_robot_ip (ip, detected_num) VALUES ($1, $2);")
+    #             "PREPARE stmt AS INSERT INTO robot_ip (detected_date, ip) VALUES ($1, $2);")
     #         extras.execute_batch(tempcur, "EXECUTE stmt (%s, %s)", records)
     #         tempcur.execute("DEALLOCATE stmt")
     #         tempdb_conn.commit()
@@ -145,10 +129,6 @@ class CrawlerIPFinder:
     #         windowend = windowstart + timedelta(seconds=10)
     #     return
 
-    def closedb(self):
-        self.cur.close()
-        self.db_conn.close()
-
     def run(self):
         '''
         save all the detected robot IPs to datases with flags
@@ -162,7 +142,7 @@ class CrawlerIPFinder:
                 print(str(er1))
             cur = db_conn.cursor()
             cur.execute(
-                "PREPARE inserts AS INSERT INTO table_robot_ip (detected_date, ip) \
+                "PREPARE inserts AS INSERT INTO robot_ip (detected_date, ip) \
                                                         VALUES ($1, $2);")
             extras.execute_batch(cur, "EXECUTE inserts (%s, %s)", records)
             cur.execute("DEALLOCATE inserts")
