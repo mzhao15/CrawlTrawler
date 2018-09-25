@@ -48,6 +48,6 @@ while taskdate < datetime(2016, 1, 10).date():
     # task2 executes only after task1 is completed
     task2.set_upstream(task1)
     # next day relay on the previous day
-    parent = task2
+    parent = task1
     # add one day increment
     taskdate = taskdate + timedelta(days=1)
