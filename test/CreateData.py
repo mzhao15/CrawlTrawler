@@ -25,5 +25,6 @@ with open(output_filename, 'w') as output:
             for line in csv_reader:
                 csv_writer.writerow(line)
         date = date + timedelta(days=1)
-os.system('rm *.csv')
+
 os.system('aws s3 mv ' + output_filename + ' s3://my-insight-data/logfiles2015/')
+os.system('rm *.csv')
