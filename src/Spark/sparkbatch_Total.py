@@ -34,7 +34,8 @@ class CountVisits:
 
     def get_robot_ip(self):
         ip_list = []
-        self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
+        # self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
+        self.cur.execute("SELECT ip FROM robot_ip;")
         records = self.cur.fetchall()  # return a list of lists
         for record in records:
             ip_list.append(record['ip'])
