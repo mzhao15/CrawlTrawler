@@ -57,8 +57,7 @@ class CountVisits:
     def counter(self, rdd):
         '''count the number of visits to each company (CIK)'''
         '''line[1]: date, line[4]:CIK '''
-        return rdd.map(lambda line: (line[1], line[4])) \
-            .map(lambda x: (','.join(x), 1)) \
+        return rdd.map(lambda line: (','.join((line[1], line[4])), 1)) \
             .reduceByKey(lambda v1, v2: v1+v2) \
             .map(lambda count: (count[0].split(','), count[1])) \
             .map(lambda count: (count[0][0], count[0][1], count[1]))
@@ -114,7 +113,7 @@ class CountVisits:
         '''
         count the number of visits by humans to each company
         '''
-        newrdd.map(lambda x: (','.join((x[1], x[2])), x[3])) \
+        newrdd.map(lambda line: (','.join((line[1], line[2])), line[3])) \
             .reduceByKey(lambda v1, v2: v1+v2) \
             .map(lambda count: (count[0].split(','), count[1])) \
             .map(lambda count: (count[0][0], count[0][1], count[1])) \
