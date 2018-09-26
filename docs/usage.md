@@ -10,7 +10,7 @@ Run spark jobs on cluster assuming necessary packages have been installed on clu
     5. cd /usr/local/spark/bin  
     6. move the python scripts to this folder  
     7. possibly use the spark-shell 'pyspark' to evaluate the code first  
-    8. spark-submit --master spark://ip-10-0-0-6:7077  
+    8. spark-submit --master spark://ip-10-0-0-4:7077  
             --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.2.0  
             --executor-memory 4G  
             sparkbatch_CrawlerFinder.py  
