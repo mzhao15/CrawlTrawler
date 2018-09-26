@@ -3,7 +3,7 @@ from pyspark import SparkContext
 from pyspark.sql import SparkSession
 import psycopg2
 from psycopg2 import extras
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from params import pql_params
 
 '''
@@ -22,6 +22,7 @@ class CrawlerIPFinder:
         self.data = raw.map(lambda line: str(line).split(',')) \
             .filter(lambda x: x[0] != 'ip')
         self.date = date
+        # connection on the master node to create table and remove old records
         try:
             self.db_conn = psycopg2.connect(**pql_params)
         except Exception as er1:
@@ -34,43 +35,8 @@ class CrawlerIPFinder:
             ip varchar(20));")
         self.db_conn.commit()
 
-    def get_totaldownloadpermin(self):
-        '''
-        find IPs which download more than 25 items in one minute
-        '''
-        return self.data.map(lambda line: (line[0], line[1], line[2].split(':'))) \
-            .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]))) \
-            .map(lambda y: (y[0], '-'.join(y[1]))) \
-            .map(lambda z: (','.join(z), 1)) \
-            .reduceByKey(lambda v1, v2: v1+v2) \
-            .filter(lambda count: count[1] > 25) \
-            .map(lambda count: count[0].split(',')) \
-            .map(lambda x: (x[1][:10], x[0]))
-
-    def get_totaldownloadperday(self):
-        '''
-        find IPs which download more than 500 times in a single day
-        '''
-        return self.data.map(lambda line: (','.join((line[0], line[1])), 1)) \
-            .reduceByKey(lambda v1, v2: v1+v2) \
-            .filter(lambda count: count[1] > 500) \
-            .map(lambda count: (count[0].split(',')[1], count[0].split(',')[0]))
-
-    def get_totalcompanypermin(self):
-        '''
-        find IPs which download items from more than 3 companies in one minute
-        '''
-        return self.data.map(lambda line: (line[0], line[1], line[2].split(':'), line[4])) \
-            .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]), x[3])) \
-            .map(lambda y: (y[0], '-'.join(y[1]), y[2])) \
-            .map(lambda z: (','.join(z), 1)) \
-            .reduceByKey(lambda v1, v2: v1+v2) \
-            .filter(lambda count: count[1] > 3) \
-            .map(lambda count: count[0].split(',')) \
-            .map(lambda x: (x[1][:10], x[0])) \
-
-
     def closedb(self):
+        '''close the database connnection on the master node'''
         self.cur.close()
         self.db_conn.close()
 
@@ -99,40 +65,59 @@ class CrawlerIPFinder:
         self.db_conn.commit()
         self.closedb()
 
-    # def get_totaldownloadpermin2(self):
-    #     '''sliding window to find the robot IPs'''
-    #     def insert(records):
-    #         tempdb_conn = psycopg2.connect(**pql_params)
-    #         tempcur = tempdb_conn.cursor()
-    #         tempcur.execute(
-    #             "PREPARE stmt AS INSERT INTO robot_ip (detected_date, ip) VALUES ($1, $2);")
-    #         extras.execute_batch(tempcur, "EXECUTE stmt (%s, %s)", records)
-    #         tempcur.execute("DEALLOCATE stmt")
-    #         tempdb_conn.commit()
-    #         tempcur.close()
-    #         tempdb_conn.close()
-    #     ip_list = []
-    #     windowstart = datetime.combine(datetime.strptime(self.date, '%Y-%m-%d'), time(0, 0, 0))
-    #     # tomorrow = windowstart + timedelta(days=1)
-    #     tomorrow = datetime(2016, 1, 1, 1, 0, 0)
-    #     # 'ip', '2016-01-01 00:00:00'
-    #     parsed_data = self.data.map(lambda x: (x[0], datetime.strptime(
-    #         ' '.join((x[1], x[2])), '%Y-%m-%d %H:%M:%S')))
-    #     windowend = windowstart + timedelta(seconds=10)
-    #     while windowend <= tomorrow:
-    #         records = parsed_data.filter(lambda x: x[1] >= windowstart and x[1]
-    #                                      <= windowend).map(lambda x: (x[0], 1)) \
-    #             .reduceByKey(lambda v1, v2: v1+v2) \
-    #             .filter(lambda count: count[1] > 25).collect()
-    #         ip_list.extend(records)
-    #         windowstart = windowstart + timedelta(seconds=1)
-    #         windowend = windowstart + timedelta(seconds=10)
-    #     return
+    def percompanypermin(self):
+        '''
+        coun the number of visits to each company per minute by each IP
+        return ('ip,datetime,cik', count)    Note: datetime='year-month-day-hour-minute'
+        '''
+        return self.data.map(lambda line: (line[0], line[1], line[2].split(':'), line[4])) \
+            .map(lambda x: (x[0], (x[1], x[2][0], x[2][1]), x[3])) \
+            .map(lambda y: (y[0], '-'.join(y[1]), y[2])) \
+            .map(lambda z: (','.join(z), 1)) \
+            .reduceByKey(lambda v1, v2: v1+v2)
+
+    def permin(self, rdd):
+        '''
+        input from self.percompanypermin()
+        count the number of visits per minute by each IP
+        return ('ip+datetime', count)   Note: datetime='year-month-day-hour-minute'
+        '''
+        return rdd.map(lambda line: (line[0].split(','), line[1])) \
+            .map(lambda x: (','.join((x[0][0], x[0][1])), x[1])) \
+            .reduceByKey(lambda v1, v2: v1+v2)
+
+    def get_totalcompanypermin(self, rdd):
+        '''
+        input from self.percompanypermin()
+        find IPs which visit more than 3 companies per minute
+        '''
+        return rdd.filter(lambda count: count[1] > 3) \
+            .map(lambda count: count[0].split(',')) \
+            .map(lambda x: (x[1][:10], x[0]))
+
+    def get_totalvisitpermin(sefl, rdd):
+        '''
+        input from self.permin()
+        find IPs which visits more than 25 items per minute
+        '''
+        return rdd.filter(lambda count: count[1] > 25) \
+            .map(lambda count: count[0].split(',')) \
+            .map(lambda x: (x[1][:10], x[0]))
+
+    def get_totalvisitperday(self, rdd):
+        '''
+        input from self.permin()
+        find IPs which visit more than 500 times in a single day
+        '''
+        return rdd.map(lambda line: (line[0].split(','), line[1])) \
+            .map(lambda x: (','.join((x[0][0], x[0][1][:10])), x[1]))\
+            .reduceByKey(lambda v1, v2: v1+v2) \
+            .filter(lambda count: count[1] > 500) \
+            .map(lambda count: (count[0].split(',')[1], count[0].split(',')[0]))
 
     def run(self):
         '''
-        save all the detected robot IPs to datases with flags
-        need to update the database based on the retention time
+        save all the detected robot IPs to the database with the detected date
         '''
         def insert(records):
             try:
@@ -151,8 +136,10 @@ class CrawlerIPFinder:
             db_conn.close()
 
         self.deleteIPs()  # clear not active robot IPs
-        self.get_totalcompanypermin().union(self.get_totaldownloadpermin()) \
-            .union(self.get_totaldownloadperday()).distinct().foreachPartition(insert)
+        cachedrdd = self.percompanypermin()
+        newcachedrdd = self.permin(cachedrdd)
+        self.get_totalcompanypermin(cachedrdd).union(self.get_totalvisitpermin(newcachedrdd)) \
+            .union(self.get_totalvisitperday(newcachedrdd)).distinct().foreachPartition(insert)
 
 
 if __name__ == "__main__":
