@@ -21,7 +21,7 @@ default_args = {
 
 # schedule_interval seems to be the interval between DAG runs
 # schedule_interval=None
-dag = DAG('mybatch_scheduler', default_args=default_args, schedule_interval=timedelta(minutes=2))
+dag = DAG('mybatch_scheduler', default_args=default_args, schedule_interval=timedelta(days=1))
 
 
 parent = None
