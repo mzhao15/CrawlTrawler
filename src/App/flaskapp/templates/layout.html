@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
     <!-- Charts -->
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     {% if title %}
         <title>{{ title }}</title>
@@ -30,13 +30,13 @@
                     <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
                 </div>
             </div>
-            <!-- <form class="form-inline">
+            <form class="form-inline">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form> -->
-            <a class="navbar-brand" href="{{ url_for('home') }}">
+            </form>
+            <!-- <a class="navbar-brand" href="{{ url_for('home') }}">
                 <img src="../static/images/insight_logo.png" width="60" height="30" class="d-inline-block align-top" alt="Insight Logo">
-            </a>
+            </a> -->
         </nav>
     </header>
 

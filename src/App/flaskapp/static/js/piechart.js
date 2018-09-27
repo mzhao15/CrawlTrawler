@@ -4,12 +4,13 @@ var piechart = document.querySelector("#piechart");
 piechart.addEventListener("click",myfunc_pie);
 
 function myfunc_pie(){
-
+    alert('hello world')
   // Load the Visualization API and the piechart package.
   google.charts.load('current', {'packages':['corechart']});
-  alert('hello world')
+
   // Set a callback to run when the Google Visualization API is loaded.
   google.charts.setOnLoadCallback(drawChart);
+
 }
 
 // Callback that creates and populates a data table,
@@ -18,6 +19,7 @@ function myfunc_pie(){
 
 function drawChart() {
 	// Create the data table.
+
 	var data = new google.visualization.DataTable();
 	data.addColumn('string', 'Topping');
 	data.addColumn('number', 'Slices');
