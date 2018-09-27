@@ -13,20 +13,9 @@ def home():
 def about():
     title = 'About'
     return render_template('about.html', title=title)
-#
-#
-# @app.route("/map")
-# def google_map():
-#     title = 'Map'
-#     return render_template('map.html', title=title)
-#
-#
-# @app.route("/price")
-# def price():
-#     title = 'Price'
-#     return render_template('price.html', title=title)
-#
-#
-# @app.route("/try")
-# def mytest():
-#     return "this is a test"
+
+
+@app.route("/charts")
+def charts():
+    title = 'Charts'
+    return render_template('charts.html', title=title)

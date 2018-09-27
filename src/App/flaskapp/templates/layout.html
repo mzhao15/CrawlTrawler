@@ -7,26 +7,26 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <!-- Charts -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
         <title>My Insight Project</title>
     {% endif %}
 </head>
-<body>
+<body class='bg-steel'>
     <header class="site-header">
-        <nav class="navbar navbar-dark bg-dark justify-content-between">
-            <!-- <a class="navbar-brand" href="#">
-                <img src="../static/images/insight_logo.png" width="60" height="30" class="d-inline-block align-top" alt="Insight Logo">
-                Insight Project
-            </a> -->
+        <nav class="navbar navbar-expand navbar-dark bg-dark justify-content-between">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav mr-auto">
                     <a class="nav-item nav-link active" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="#">Features</a>
+                    <a class="nav-item nav-link" href="#">Spark</a>
                     <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
                 </div>
             </div>
@@ -34,12 +34,47 @@
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form> -->
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <img src="../static/images/insight_logo.png" width="60" height="30" class="d-inline-block align-top" alt="Insight Logo">
+            </a>
         </nav>
     </header>
 
-    <main>
-        {% block content %}{% endblock %}
+    <main role="main" class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 bd-sidebar">
+                <div class="content-section">
+                    <ul class="nav flex-column">
+                        <li class="list-group-item text-primary list-group-item-light">
+                            <a href="{{url_for('charts')}}">Total</a>
+                        </li>
+                        <li class="list-group-item text-primary list-group-item-light">
+                            <a href="#">User</a>
+                        </li>
+                        <li class="list-group-item text-primary list-group-item-light">
+                            <a href="#">Web Crawler</a>
+                        </li>
+                        <li class="list-group-item text-primary list-group-item-light">
+                            <a href="#">Compare</a>
+                        </li>
+                        <li class="list-group-item text-primary list-group-item-light">
+                            <a href="#">FAQ</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-10">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
     </main>
+    <footer class='footer text-muted'>
+        <div class="container">
+            <!-- <p class="float-right"><a href="#">Back to top</a></p> -->
+            <p>This website is used to demonstrate the Insight Data Engineering project developed
+                by Meng Zhao. If you have any questions, please contact at mengzhao0408@gmail.com.</p>
+        </div>
+    </footer>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

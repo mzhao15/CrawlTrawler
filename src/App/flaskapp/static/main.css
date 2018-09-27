@@ -1,0 +1,23 @@
+body {
+  background: #fafafa;
+  color: #333333;
+}
+.bg-hemi {
+  background-color: #5d6d7e;
+}
+
+ul li.inline{
+  display:inline;
+  list-style-type: none;
+  margin:5px;
+  padding:2px 4px;
+}
+
+footer{
+    font-size: 10pt;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 50px;
+    width: 100%;
+}
