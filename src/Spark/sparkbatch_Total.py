@@ -8,6 +8,9 @@ from params import pql_params
 '''
 this batch job is to get the number of visits by human and robot to each company
 argument (date of the log file), example: 2016-01-01
+csv file column names:
+    'ip', 'date', 'time', 'zone', 'cik', 'accession', 'extention', 'code',
+    'size','idx', 'norefer', 'noagent', 'find', 'crawler', 'browser'
 '''
 
 
@@ -21,6 +24,7 @@ class CountVisits:
         self.data = raw.map(lambda line: str(line).split(',')) \
             .filter(lambda x: x[0] != 'ip')
         self.date = date
+        # extract the detected robot ip list (on master node)
         try:
             self.db_conn = psycopg2.connect(**pql_params)
         except Exception as er1:
@@ -42,6 +46,7 @@ class CountVisits:
         return ip_list
 
     def createtable(self):
+        '''create two tables: one for total visits, one for visits by humans only'''
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS total (id serial PRIMARY KEY, \
                                                 visit_date date, \
@@ -55,16 +60,16 @@ class CountVisits:
         self.db_conn.commit()
         return
 
-    def counter(self, rdd):
-        '''count the number of visits to each company (CIK)'''
-        '''line[1]: date, line[4]:CIK '''
-        return rdd.map(lambda line: (','.join((line[1], line[4])), 1)) \
-            .reduceByKey(lambda v1, v2: v1+v2) \
-            .map(lambda count: (count[0].split(','), count[1])) \
-            .map(lambda count: (count[0][0], count[0][1], count[1]))
+    def percompanyperIP(self):
+        ''' get the number of visits to each company by each IP '''
+        ''' input: the parsed raw data: self.data  '''
+        ''' output: (ip+date+cik, count) '''
+        return self.data.map(lambda line: (','.join((line[0], line[1], line[4])), 1)) \
+            .reduceByKey(lambda v1, v2: v1+v2)
 
-    def totalvisits(self):
+    def totalvisits(self, rdd):
         def inserttotal(records):
+            ''' insert processed records into "total" in batch '''
             try:
                 db_conn = psycopg2.connect(**pql_params)
             except Exception as er1:
@@ -80,9 +85,16 @@ class CountVisits:
             cur.close()
             db_conn.close()
 
-        self.counter(self.data).foreachPartition(inserttotal)
+        # self.counter(self.data).foreachPartition(inserttotal)
+        rdd.map(lambda count: (count[0].split(','), count[1])) \
+            .map(lambda count: (','.join((count[0][1], count[0][2])), count[1])) \
+            .reduceByKey(lambda v1, v2: v1+v2) \
+            .map(lambda count: (count[0].split(','), count[1])) \
+            .map(lambda count: (count[0][0], count[0][1], count[1])) \
+            .foreachPartition(inserttotal)
 
-    def humanvisits(self):
+    def humanvisits(self, rdd):
+        ''' input rdd: count of visits per company per IP '''
         def inserthuman(records):
             try:
                 db_conn = psycopg2.connect(**pql_params)
@@ -100,21 +112,11 @@ class CountVisits:
             db_conn.close()
 
         filters = self.robot_ip_list
-        # self.counter(self.data.filter(
-        #     lambda line: line[0] not in filters)).foreachPartition(inserthuman)
-        '''
-        get the number of visits per IP to each company
-        filter out the visits by robot IPs
-        '''
-        newrdd = self.data.map(lambda line: (','.join((line[0], line[1], line[4])), 1)) \
-            .reduceByKey(lambda v1, v2: v1+v2) \
-            .map(lambda count: (count[0].split(','), count[1])) \
-            .map(lambda x: (x[0][0], x[0][1], x[0][2], x[1])) \
-            .filter(lambda x: x[0] not in filters)
-        '''
-        count the number of visits by humans to each company
-        '''
-        newrdd.map(lambda line: (','.join((line[1], line[2])), line[3])) \
+        # count the number of visits by humans to each company
+        rdd.map(lambda count: (count[0].split(','), count[1])) \
+            .map(lambda count: (count[0][0], count[0][1], count[0][2], count[1])) \
+            .filter(lambda line: line[0] not in filters) \
+            .map(lambda line: (','.join((line[1], line[2])), line[3])) \
             .reduceByKey(lambda v1, v2: v1+v2) \
             .map(lambda count: (count[0].split(','), count[1])) \
             .map(lambda count: (count[0][0], count[0][1], count[1])) \
@@ -122,11 +124,10 @@ class CountVisits:
 
     def run(self):
         ''' get the total number of visits to each company
-            get the total number of visits by human to each company
-        '''
-
-        self.totalvisits()
-        self.humanvisits()
+            get the total number of visits by human to each company'''
+        rdd = self.percompanyperIP()
+        self.totalvisits(rdd)
+        self.humanvisits(rdd)
         return
 
 
@@ -139,7 +140,6 @@ if __name__ == '__main__':
     year, month, day = sys.argv[1].split('-')
     foldername = 'logfiles' + year
     filename = 'log' + ''.join((year, month, day)) + '.csv'
-    # data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
     data_path = 's3a://my-insight-data/' + foldername + '/' + filename
     visits = CountVisits(data_path, sys.argv[1])
     visits.run()
