@@ -1,16 +1,16 @@
 
+
+
 var piechart = document.querySelector("#piechart");
 
 piechart.addEventListener("click",myfunc_pie);
 
 function myfunc_pie(){
-    alert('hello world')
-  // Load the Visualization API and the piechart package.
+// Load the Visualization API and the piechart package.
   google.charts.load('current', {'packages':['corechart']});
-
+  alert('hello world')
   // Set a callback to run when the Google Visualization API is loaded.
   google.charts.setOnLoadCallback(drawChart);
-
 }
 
 // Callback that creates and populates a data table,
@@ -19,7 +19,7 @@ function myfunc_pie(){
 
 function drawChart() {
 	// Create the data table.
-
+    alert('hello world')
 	var data = new google.visualization.DataTable();
 	data.addColumn('string', 'Topping');
 	data.addColumn('number', 'Slices');
@@ -32,7 +32,7 @@ function drawChart() {
 	]);
 
 	// Set chart options
-	var options = {'title':'How Much Food I Ate Last Night',
+	var options = {'title':'How Much Pizza I Ate Last Night',
 	               'width':400,
 	               'height':300};
 

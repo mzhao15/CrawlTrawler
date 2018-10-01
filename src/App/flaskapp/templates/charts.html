@@ -8,34 +8,47 @@
 	<ul class='fload-none'>
 		<li class="inline"><a href="" id="piechart">Pie chart</a></li>
 		<li class="inline"><a href="" id="bubblechart">Bubble chart</a></li>
+		<li class="inline"><a href="" id="linechart">Line chart</a></li>
 	</ul>
 </div>
 
-<canvas id="myChart" style="max-width: 500px;"></canvas>
+<div id="chart">
+	<canvas id="myChart" style="max-width: 500px;"></canvas>
+</div>
+
+
 <script>
-	var ctx = document.getElementById('myChart').getContext('2d');
-	var chart = new Chart(ctx, {
-		// The type of chart we want to create
-		type: 'line',
+	var linechart = document.querySelector("#linechart");
 
-		// The data for our dataset
-		data: {
-			labels: ["January", "February", "March", "April", "May", "June", "July"],
-			datasets: [{
-				label: "My First dataset",
-				backgroundColor: 'rgb(255, 99, 132)',
-				borderColor: 'rgb(255, 99, 132)',
-				data: [0, 10, 5, 2, 20, 30, 45],
-			}]
-		},
+	linechart.addEventListener("click",myfunc_line);
 
-		// Configuration options go here
-		options: {}
-	});
+	function myfunc_line(){
+		var ctx = document.getElementById('myChart').getContext('2d');
+		var chart = new Chart(ctx, {
+			// The type of chart we want to create
+			type: 'line',
+
+			// The data for our dataset
+			data: {
+				labels: ["January", "February", "March", "April", "May", "June", "July"],
+				datasets: [{
+					label: "My First dataset",
+					backgroundColor: 'rgb(255, 99, 132)',
+					borderColor: 'rgb(255, 99, 132)',
+					data: [0, 10, 5, 2, 20, 30, 45],
+				}]
+			},
+
+			// responsive: true
+
+			// Configuration options go here
+			options: {}
+		});
+	}
 </script>
 
-
-<!-- <script src="../static/js/piechart.js"></script>
-<script src="../static/js/bubblechart.js"></script> -->
+<!-- <script src="../static/js/linechart.js"></script> -->
+<!-- <script src="../static/js/piechart.js"></script> -->
+<!-- <script src="../static/js/bubblechart.js"></script> -->
 
 {% endblock content %}
