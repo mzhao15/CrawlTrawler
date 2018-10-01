@@ -1,5 +1,5 @@
 Install Apache Airflow:
-# add the following in .bashrc
+# add the following in .bashrc and source it
     export AIRFLOW_HOME=~/airflow
     export SLUGIFY_USES_TEXT_UNIDECODE=yes  (optional, if there is a dependency issue)
 # execute to install Airflow

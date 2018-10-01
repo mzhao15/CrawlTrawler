@@ -30,3 +30,13 @@ Connect to rds PostgreSQL database:
     2. find all the connection parameters: master-username, password, endpoint, port (5432)  
     3. make sure security group allows visits  
     4. remember to commit after create, update, insert ...
+
+
+Necessary packages:
+
+    hadoop
+    spark
+    bc
+    airflow
+    psycopg2
+    Flask
