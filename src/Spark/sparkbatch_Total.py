@@ -46,9 +46,9 @@ class CountVisits:
         # extract the detected robot ip list (on master node)
         try:
             self.db_conn = psycopg2.connect(**pql_params)
-        except Exception as er1:
+        except Exception as er2:
             print('cannot connect to PostgreSQL database\n')
-            print(str(er1))
+            print(str(er2))
         self.cur = self.db_conn.cursor(cursor_factory=extras.DictCursor)
         self.create_table('total')
         self.create_table('human')
@@ -71,7 +71,7 @@ class CountVisits:
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS {} (id serial PRIMARY KEY, \
                                                 visit_date date, \
-                                                cik varchar(50), \
+                                                cik integer, \
                                                 num_of_visits int);".format(table_name))
         self.db_conn.commit()
         return
