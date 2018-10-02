@@ -1,27 +1,35 @@
 
-var crawler = document.querySelector("#crawler");
-crawler.addEventListener("click",myfunc_line);
+$(document).ready(function(){
+    $("#crawler").click(function(){
+        var cik = $("#cik").val();
+        var startdate = $("#startdate").val();
+        var enddate = $("#enddate").val();
+        var disp = "crawler";
+        $.getJSON("/getdata", { 'cik': cik, 'start_date': startdate, 'end_date': enddate, 'disp_name': disp })
+        .done(function (jsonData){
+            console.log(jsonData)
+            // Load the Visualization API and the package.
+            google.charts.load('current', {'packages':['corechart']});
+            // Set a callback to run when the Google Visualization API is loaded.
+            google.charts.setOnLoadCallback(drawJson(jsonData));
+            function drawJson(jsonData) {
+              var data = new google.visualization.DataTable();
+              data.addColumn('string', 'visit_date');
+              data.addColumn('number', 'num_of_visits');
 
-function myfunc_line(){
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var chart = new Chart(ctx, {
-    	// The type of chart we want to create
-    	type: 'line',
-
-    	// The data for our dataset
-    	data: {
-    		labels: ["January", "February", "March", "April", "May", "June", "July"],
-    		datasets: [{
-    			label: "My First dataset",
-    			backgroundColor: 'rgb(255, 99, 132)',
-    			borderColor: 'rgb(255, 99, 132)',
-    			data: [0, 10, 5, 2, 20, 30, 45],
-    		}]
-    	},
-
-        // responsive: true
-
-    	// Configuration options go here
-    	options: {}
+              jsonData.forEach(function (row) {
+                data.addRow([
+                  row.visit_date,
+                  row.num_of_visits
+                  ]);
+              });
+              var options = {'title':'Web Crawler Visits',
+                             // 'width':800,
+                             'height':400};
+              // Instantiate and draw our chart, passing in some options.
+              var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+              chart.draw(data, options);
+            }
+        });
     });
-}
+});

@@ -1,37 +1,35 @@
 
-var bubblechart = document.querySelector("#user");
+$(document).ready(function(){
+    $("#user").click(function(){
+        var cik = $("#cik").val();
+        var startdate = $("#startdate").val();
+        var enddate = $("#enddate").val();
+        var disp = "human";
+        $.getJSON("/getdata", { 'cik': cik, 'start_date': startdate, 'end_date': enddate, 'disp_name': disp })
+        .done(function (jsonData){
+            console.log(jsonData)
+            // Load the Visualization API and the package.
+            google.charts.load('current', {'packages':['corechart']});
+            // Set a callback to run when the Google Visualization API is loaded.
+            google.charts.setOnLoadCallback(drawJson(jsonData));
+            function drawJson(jsonData) {
+              var data = new google.visualization.DataTable();
+              data.addColumn('string', 'visit_date');
+              data.addColumn('number', 'num_of_visits');
 
-bubblechart.addEventListener("click",myfunc_bubble);
-
-function myfunc_bubble(){
-  google.charts.load('current', {'packages':['corechart']});
-  google.charts.setOnLoadCallback(drawSeriesChart);
-}
-
-function drawSeriesChart() {
-
-  var data = google.visualization.arrayToDataTable([
-    ['ID', 'Life Expectancy', 'Fertility Rate', 'Region',     'Population'],
-    ['CAN',    80.66,              1.67,      'North America',  33739900],
-    ['DEU',    79.84,              1.36,      'Europe',         81902307],
-    ['DNK',    78.6,               1.84,      'Europe',         5523095],
-    ['EGY',    72.73,              2.78,      'Middle East',    79716203],
-    ['GBR',    80.05,              2,         'Europe',         61801570],
-    ['IRN',    72.49,              1.7,       'Middle East',    73137148],
-    ['IRQ',    68.09,              4.77,      'Middle East',    31090763],
-    ['ISR',    81.55,              2.96,      'Middle East',    7485600],
-    ['RUS',    68.6,               1.54,      'Europe',         141850000],
-    ['USA',    78.09,              2.05,      'North America',  307007000]
-  ]);
-
-  var options = {
-    title: 'Correlation between life expectancy, fertility rate ' +
-           'and population of some world countries (2010)',
-    hAxis: {title: 'Life Expectancy'},
-    vAxis: {title: 'Fertility Rate'},
-    bubble: {textStyle: {fontSize: 11}},
-  };
-
-  var chart = new google.visualization.BubbleChart(document.getElementById('chart'));
-  chart.draw(data, options);
-}
+              jsonData.forEach(function (row) {
+                data.addRow([
+                  row.visit_date,
+                  row.num_of_visits
+                  ]);
+              });
+              var options = {'title':'Total Visits',
+                             // 'width':800,
+                             'height':400};
+              // Instantiate and draw our chart, passing in some options.
+              var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+              chart.draw(data, options);
+            }
+        });
+    });
+});

@@ -24,8 +24,8 @@
   </div>
 
   <div class="col-md-10">
-  	  <div id="selectform">
-  	  	<form>
+  	  <div>
+  	  	<form id="selectform">
 		  <div class="form-row">
 		    <div class="col">
 		      <label for="cik">Choose a company:</label>
@@ -47,7 +47,7 @@
 	  </div>
 	  <!-- preload a chart-->
 	  <script>
-	  	// Load the Visualization API and the piechart package.
+	  	// Load the Visualization API and the package.
 	  	google.charts.load('current', {'packages':['corechart']});
 	  	// Set a callback to run when the Google Visualization API is loaded.
 	  	google.charts.setOnLoadCallback(drawChart);
@@ -85,10 +85,8 @@
 		}
 	  </script>
   </div>
-
 </div>
 <script src="../static/js/total.js"></script>
 <script src="../static/js/user.js"></script>
 <script src="../static/js/crawler.js"></script>
-
 {% endblock content %}
