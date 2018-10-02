@@ -71,7 +71,7 @@ class CountVisits:
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS {} (id serial PRIMARY KEY, \
                                                 visit_date date, \
-                                                cik integer, \
+                                                cik varchar(50), \
                                                 num_of_visits int);".format(table_name))
         self.db_conn.commit()
         return
