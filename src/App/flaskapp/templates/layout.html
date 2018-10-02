@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
     <!-- load the AJAX API -->
-    <!-- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> -->
-    <script type="text/javascript" src="{{ url_for('static', filename='Chart.min.js') }}"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='Chart.min.js') }}"></script> -->
 
     {% if title %}
         <title>{{title}}</title>
@@ -29,7 +29,8 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item text-info nav-link" href="/">Home</a>
-              <a class="nav-item text-info nav-link" href="/spark">Spark</a>
+              <a class="nav-item text-info nav-link" href="/charts">Data</a>
+              <a class="nav-item text-info nav-link" href="/airflow">Airflow</a>
               <a class="nav-item text-info nav-link" href="/about">About</a>
             </div>
             <div class="navbar-nav">

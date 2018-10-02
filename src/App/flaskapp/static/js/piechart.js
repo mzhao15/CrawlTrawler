@@ -33,7 +33,7 @@ function drawChart() {
 	               'height':300};
 
 	// Instantiate and draw our chart, passing in some options.
-	var chart = new google.visualization.PieChart(document.getElementById('myChart'));
+	var chart = new google.visualization.PieChart(document.getElementById('chart'));
 
 	function selectHandler() {
 	  var selectedItem = chart.getSelection()[0];

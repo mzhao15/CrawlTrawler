@@ -32,6 +32,6 @@ function drawSeriesChart() {
     bubble: {textStyle: {fontSize: 11}},
   };
 
-  var chart = new google.visualization.BubbleChart(document.getElementById('myChart'));
+  var chart = new google.visualization.BubbleChart(document.getElementById('chart'));
   chart.draw(data, options);
 }

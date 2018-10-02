@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-md-2 bd-sidebar">
+	  <div class="content-section">
+		  <ul class="nav flex-column">
+			  <li class="list-group-item text-primary list-group-item-light">
+				  <a id="total" href="#">Total</a>
+			  </li>
+			  <li class="list-group-item text-primary list-group-item-light">
+				  <a id="user" href="#">User</a>
+			  </li>
+			  <li class="list-group-item text-primary list-group-item-light">
+				  <a id="crawler" href="#">Web Crawler</a>
+			  </li>
+			  <li class="list-group-item text-primary list-group-item-light">
+				  <a href="#">Compare</a>
+			  </li>
+			  <li class="list-group-item text-primary list-group-item-light">
+				  <a href="#">FAQ</a>
+			  </li>
+		  </ul>
+	  </div>
+  </div>
+
+  <div class="col-md-10">
+	  <div id="chart">
+		  <!-- <canvas id="myChart" style="max-width: 800px;"></canvas> -->
+	  </div>
+	  <!-- preload a chart-->
+	  <script>
+	  	// Load the Visualization API and the piechart package.
+	  	google.charts.load('current', {'packages':['corechart']});
+	  	// Set a callback to run when the Google Visualization API is loaded.
+	  	google.charts.setOnLoadCallback(drawChart);
+	  	function drawChart() {
+			// Create the data table.
+			var data = new google.visualization.DataTable();
+			data.addColumn('string', 'Date');
+			data.addColumn('number', '# of visits');
+			data.addRows([
+			  ['2016-01-01', 3],
+			  ['2016-01-02', 1],
+			  ['2016-01-03', 1],
+			  ['2016-01-04', 1],
+			  ['2016-01-05', 2]
+			]);
+
+			// Set chart options
+			var options = {'title':'Example',
+			               // 'width':800,
+			               'height':400};
+
+			// Instantiate and draw our chart, passing in some options.
+			var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+
+			function selectHandler() {
+			  var selectedItem = chart.getSelection()[0];
+			  if (selectedItem) {
+			    var date = data.getValue(selectedItem.row, 0);
+			    alert('The user selected ' + data);
+			  }
+			}
+
+			google.visualization.events.addListener(chart, 'select', selectHandler);
+			chart.draw(data, options);
+		}
+	  </script>
+  </div>
+</div>
+<script src="../static/js/piechart.js"></script>
+<script src="../static/js/bubblechart.js"></script>
+<!-- <script src="../static/js/user.js"></script> -->
+
+{% endblock content %}
