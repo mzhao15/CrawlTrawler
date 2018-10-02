@@ -1,14 +1,11 @@
 
-
-
-var piechart = document.querySelector("#piechart");
+var piechart = document.querySelector("#total");
 
 piechart.addEventListener("click",myfunc_pie);
 
 function myfunc_pie(){
 // Load the Visualization API and the piechart package.
   google.charts.load('current', {'packages':['corechart']});
-  alert('hello world')
   // Set a callback to run when the Google Visualization API is loaded.
   google.charts.setOnLoadCallback(drawChart);
 }
@@ -19,7 +16,6 @@ function myfunc_pie(){
 
 function drawChart() {
 	// Create the data table.
-    alert('hello world')
 	var data = new google.visualization.DataTable();
 	data.addColumn('string', 'Topping');
 	data.addColumn('number', 'Slices');
@@ -37,7 +33,7 @@ function drawChart() {
 	               'height':300};
 
 	// Instantiate and draw our chart, passing in some options.
-	var chart = new google.visualization.PieChart(document.getElementById('chart'));
+	var chart = new google.visualization.PieChart(document.getElementById('myChart'));
 
 	function selectHandler() {
 	  var selectedItem = chart.getSelection()[0];

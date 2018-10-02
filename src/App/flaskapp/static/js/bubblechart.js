@@ -1,5 +1,5 @@
 
-var bubblechart = document.querySelector("#bubblechart");
+var bubblechart = document.querySelector("#user");
 
 bubblechart.addEventListener("click",myfunc_bubble);
 
@@ -32,6 +32,6 @@ function drawSeriesChart() {
     bubble: {textStyle: {fontSize: 11}},
   };
 
-  var chart = new google.visualization.BubbleChart(document.getElementById('chart'));
+  var chart = new google.visualization.BubbleChart(document.getElementById('myChart'));
   chart.draw(data, options);
 }

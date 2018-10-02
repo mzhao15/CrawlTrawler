@@ -15,7 +15,7 @@ def about():
     return render_template('about.html', title=title)
 
 
-@app.route("/charts")
-def charts():
-    title = 'Charts'
-    return render_template('charts.html', title=title)
+@app.route("/spark")
+def spark():
+    title = 'Spark'
+    return render_template('spark.html', title=title)

@@ -1,7 +1,6 @@
 
-var linechart = document.querySelector("#linechart");
-
-linechart.addEventListener("click",myfunc_line);
+var crawler = document.querySelector("#crawler");
+crawler.addEventListener("click",myfunc_line);
 
 function myfunc_line(){
     var ctx = document.getElementById('myChart').getContext('2d');
