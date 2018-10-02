@@ -25,7 +25,7 @@ cur = conn.cursor(cursor_factory=extras.DictCursor)
 # cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (500, "wrc"))
 
 # Execute command to query the table.
-cur.execute("SELECT DISTINCT ip, detected_date FROM table_robot_ip WHERE detected_num > 100;")
+cur.execute("SELECT DISTINCT ip, detected_date FROM robot_ip WHERE detected_num > 100;")
 # cur.execute("SELECT * FROM human_visits WHERE num_of_visits > 100;")
 # After executing the query, need to define a list to put the results in: rows
 rows = cur.fetchall()
