@@ -31,8 +31,8 @@ class CrawlerIPFinder:
         self.cur = self.db_conn.cursor(cursor_factory=extras.DictCursor)
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS robot_ip (id serial PRIMARY KEY, \
-            detected_date date, \
-            ip varchar(20));")
+                                       detected_date date, \
+                                                  ip varchar(20));")
         self.db_conn.commit()
 
     def closedb(self):
@@ -41,27 +41,36 @@ class CrawlerIPFinder:
         self.db_conn.close()
 
     def deleteIPs(self):
-        '''remove robot IPs which have not been active for more than 30 days'''
+        '''
+        remove robot IPs which were detected more than 30 days ago
+        remove duplicated IPs
+        '''
         tdy = datetime.strptime(self.date, '%Y-%m-%d')
         checkday = tdy - timedelta(days=30)
-        self.cur.execute("SELECT id, ip FROM robot_ip WHERE detected_date=%s;", (checkday,))
-        records = self.cur.fetchall()
-        if not records:
-            '''the first 30 days'''
-            return
-        self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date>%s;", (checkday,))
-        new_records = self.cur.fetchall()
-        ips = []  # list of ips deteted after the check day
-        for record in new_records:
-            if record['ip'] not in ips:
-                ips.append(record['ip'])
-        delete_list = []  # list of ips need to be deleted
-        for i in range(len(records)):
-            if records[i]['ip'] not in ips:
-                delete_list.append(records[i]['id'])
-        self.cur.execute('DELETE FROM robot_ip WHERE id IN %s', (tuple(delete_list),))
+        # self.cur.execute("SELECT id, ip FROM robot_ip WHERE detected_date=%s;", (checkday,))
+        # records = self.cur.fetchall()
+        # if not records:
+        #     '''the first 30 days'''
+        #     return
+        # self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date>%s;", (checkday,))
+        # new_records = self.cur.fetchall()
+        # ips = []  # list of ips deteted after the check day
+        # for record in new_records:
+        #     if record['ip'] not in ips:
+        #         ips.append(record['ip'])
+        # delete_list = []  # list of ips need to be deleted
+        # for i in range(len(records)):
+        #     if records[i]['ip'] not in ips:
+        #         delete_list.append(records[i]['id'])
+        # self.cur.execute('DELETE FROM robot_ip WHERE id IN %s', (tuple(delete_list),))
+
         # delete IPs which were detected more than 30 days ago
-        self.cur.execute('DELETE FROM robot_ip WHERE detected_date<%s', (checkday,))
+        self.cur.execute('DELETE FROM robot_ip \
+                                WHERE detected_date<%s', (checkday,))
+        # delete duplicated IPs
+        self.cur.execute('DELETE FROM robot_ip a \
+                                USING robot_ip b \
+                                WHERE a.detected_date < b.detected_date AND a.ip=b.ip;')
         self.db_conn.commit()
         self.closedb()
 
@@ -122,9 +131,9 @@ class CrawlerIPFinder:
         def insert(records):
             try:
                 db_conn = psycopg2.connect(**pql_params)
-            except Exception as er1:
+            except Exception as er2:
                 print('cannot connect to PostgreSQL database\n')
-                print(str(er1))
+                print(str(er2))
             cur = db_conn.cursor()
             cur.execute(
                 "PREPARE inserts AS INSERT INTO robot_ip (detected_date, ip) \
@@ -135,7 +144,8 @@ class CrawlerIPFinder:
             cur.close()
             db_conn.close()
 
-        self.deleteIPs()  # clear not active robot IPs
+        # clear old robot IPs and duplicated robot IPs
+        self.deleteIPs()
         cachedrdd = self.percompanypermin()
         newcachedrdd = self.permin(cachedrdd)
         self.get_totalcompanypermin(cachedrdd).union(self.get_totalvisitpermin(newcachedrdd)) \

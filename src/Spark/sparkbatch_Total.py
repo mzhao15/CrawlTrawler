@@ -24,7 +24,7 @@ def batch_insert(table_name, records):
     cur = db_conn.cursor()
     cur.execute(
         "PREPARE stmt AS INSERT INTO {} (visit_date, cik, num_of_visits) \
-                                                VALUES ($1, $2, $3);".format(table_name))
+                                 VALUES ($1, $2, $3);".format(table_name))
     extras.execute_batch(cur, "EXECUTE stmt (%s, %s, %s)", records)
     cur.execute("DEALLOCATE stmt")
     db_conn.commit()
@@ -59,8 +59,8 @@ class CountVisits:
     def get_robot_ip(self):
         ''' get the list of robot ips from database'''
         ip_list = []
-        self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
-        # self.cur.execute("SELECT ip FROM robot_ip;")
+        # self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
+        self.cur.execute("SELECT ip FROM robot_ip;")
         records = self.cur.fetchall()
         for record in records:
             ip_list.append(record['ip'])
@@ -70,9 +70,9 @@ class CountVisits:
         ''' create a table named as table_name, table schema is predefined '''
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS {} (id serial PRIMARY KEY, \
-                                                visit_date date, \
-                                                cik varchar(50), \
-                                                num_of_visits int);".format(table_name))
+                                    visit_date date, \
+                                           cik varchar(50), \
+                                 num_of_visits int);".format(table_name))
         self.db_conn.commit()
         return
 
@@ -84,7 +84,9 @@ class CountVisits:
             .reduceByKey(lambda v1, v2: v1+v2)
 
     def total_visit(self, count_percompany_perIP):
-        '''     '''
+        '''
+        get the total visits to each company's documents per day
+        '''
 
         def insert(records):
             ''' insert processed records into "total" in batch '''
@@ -98,7 +100,9 @@ class CountVisits:
             .foreachPartition(insert)
 
     def human_visit(self, count_percompany_perIP):
-        '''  '''
+        '''
+        get the number of visits to each company's documents per day by humans only
+        '''
 
         def insert(records):
             batch_insert('human', records)
@@ -115,8 +119,10 @@ class CountVisits:
             .foreachPartition(insert)
 
     def run(self):
-        ''' get the total number of visits to each company
-            get the total number of visits by human to each company'''
+        '''
+        get the total number of visits to each company
+        get the total number of visits by human to each company
+        '''
         count_percompany_perIP = self.count_percompany_perIP()
         self.total_visit(count_percompany_perIP)
         self.human_visit(count_percompany_perIP)
