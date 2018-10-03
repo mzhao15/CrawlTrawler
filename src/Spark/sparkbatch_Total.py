@@ -59,8 +59,8 @@ class CountVisits:
     def get_robot_ip(self):
         ''' get the list of robot ips from database'''
         ip_list = []
-        # self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
-        self.cur.execute("SELECT ip FROM robot_ip;")
+        self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
+        # self.cur.execute("SELECT ip FROM robot_ip;")
         records = self.cur.fetchall()
         for record in records:
             ip_list.append(record['ip'])
@@ -87,7 +87,6 @@ class CountVisits:
         '''
         get the total visits to each company's documents per day
         '''
-
         def insert(records):
             ''' insert processed records into "total" in batch '''
             batch_insert('total', records)
@@ -103,7 +102,6 @@ class CountVisits:
         '''
         get the number of visits to each company's documents per day by humans only
         '''
-
         def insert(records):
             batch_insert('human', records)
 

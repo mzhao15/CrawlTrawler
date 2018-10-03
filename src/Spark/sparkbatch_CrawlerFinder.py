@@ -47,27 +47,10 @@ class CrawlerIPFinder:
         '''
         tdy = datetime.strptime(self.date, '%Y-%m-%d')
         checkday = tdy - timedelta(days=30)
-        # self.cur.execute("SELECT id, ip FROM robot_ip WHERE detected_date=%s;", (checkday,))
-        # records = self.cur.fetchall()
-        # if not records:
-        #     '''the first 30 days'''
-        #     return
-        # self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date>%s;", (checkday,))
-        # new_records = self.cur.fetchall()
-        # ips = []  # list of ips deteted after the check day
-        # for record in new_records:
-        #     if record['ip'] not in ips:
-        #         ips.append(record['ip'])
-        # delete_list = []  # list of ips need to be deleted
-        # for i in range(len(records)):
-        #     if records[i]['ip'] not in ips:
-        #         delete_list.append(records[i]['id'])
-        # self.cur.execute('DELETE FROM robot_ip WHERE id IN %s', (tuple(delete_list),))
-
         # delete IPs which were detected more than 30 days ago
         self.cur.execute('DELETE FROM robot_ip \
                                 WHERE detected_date<%s', (checkday,))
-        # delete duplicated IPs
+        # delete duplicate IPs
         self.cur.execute('DELETE FROM robot_ip a \
                                 USING robot_ip b \
                                 WHERE a.detected_date < b.detected_date AND a.ip=b.ip;')
@@ -137,7 +120,7 @@ class CrawlerIPFinder:
             cur = db_conn.cursor()
             cur.execute(
                 "PREPARE inserts AS INSERT INTO robot_ip (detected_date, ip) \
-                                                        VALUES ($1, $2);")
+                                                  VALUES ($1, $2);")
             extras.execute_batch(cur, "EXECUTE inserts (%s, %s)", records)
             cur.execute("DEALLOCATE inserts")
             db_conn.commit()
@@ -160,7 +143,6 @@ if __name__ == "__main__":
     year, month, day = sys.argv[1].split('-')
     foldername = 'logfiles' + year
     filename = 'log' + ''.join((year, month, day)) + '.csv'
-    # data_path = "s3a://my-insight-data/logfiles2016/log20160101.csv"
     data_path = 's3a://my-insight-data/' + foldername + '/' + filename
     finder = CrawlerIPFinder(data_path, sys.argv[1])
     finder.run()
