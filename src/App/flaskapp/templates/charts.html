@@ -11,7 +11,7 @@
 				  <a id="user" href="#">User</a>
 			  </li>
 			  <li class="list-group-item text-primary list-group-item-light">
-				  <a id="combo" href="#">Compare</a>
+				  <a id="compare" href="#">Compare</a>
 			  </li>
 			  <li class="list-group-item text-primary list-group-item-light">
 				  <a href="#">FAQ</a>
@@ -26,7 +26,7 @@
 		  <div class="form-row">
 		    <div class="col">
 		      <label for="cik">Choose a company:</label>
-		      <input id="cik" type="text" class="form-control" placeholder="00000000">
+		      <input id="cik" type="text" class="form-control" placeholder="1542574">
 		    </div>
 		    <div class="col">
 		      <label for="startdate">Choose a starting date:</label>
@@ -62,11 +62,15 @@
 			]);
 
 			// Set chart options
-			var options = {'title':'Example',
+			var options = { 'title': 'Example',
                             'legend': 'none',
-                            'hAxis': {'title': 'Date', textPosition: 'none', titleTextStyle:{fontSize: '18', bold: true,italic: false}},
-                            'vAxis': {'title': 'Number of Visits', titleTextStyle:{fontSize: '18', bold: true,italic: false}},
-			               'height':400};
+                            'titleTextStyle': { fontName: 'Times-Roman', postition: 'center', fontSize: '18', bold: true, italic: false },
+                            'legend': 'none',
+                            'hAxis': {'title': 'Date', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
+                            'vAxis': {'title': 'Number of Visits', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
+			                'height': 400,
+                            'colors': ['green']
+                        };
 
 			// Instantiate and draw our chart, passing in some options.
 			var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
@@ -87,5 +91,5 @@
 </div>
 <script src="../static/js/total.js"></script>
 <script src="../static/js/user.js"></script>
-<script src="../static/js/combo.js"></script>
+<script src="../static/js/compare.js"></script>
 {% endblock content %}

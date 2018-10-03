@@ -1,10 +1,10 @@
 
 $(document).ready(function(){
-    $("#combo").click(function(){
+    $("#compare").click(function(){
         var cik = $("#cik").val();
         var startdate = $("#startdate").val();
         var enddate = $("#enddate").val();
-        var disp = "combo";
+        var disp = "compare";
         $.getJSON("/getdata", { 'cik': cik, 'start_date': startdate, 'end_date': enddate, 'disp_name': disp })
         .done(function (jsonData){
             console.log(jsonData)
@@ -15,20 +15,26 @@ $(document).ready(function(){
             function drawJson(jsonData) {
               var data = new google.visualization.DataTable();
               data.addColumn('string', 'visit_date');
-              data.addColumn('number', 'total_visits');
               data.addColumn('number', 'human_visits');
+              data.addColumn('number', 'robot_visits');
 
               jsonData.forEach(function (row) {
                 data.addRow([
                   row.visit_date,
-                  row.total_visits,
-                  row.human_visits
+                  row.human_visits,
+                  row.robot_visits
                   ]);
               });
               var options = {'title': 'Comparison',
+                              'titleTextStyle': { fontName: 'Times-Roman', postition: 'center', fontSize: '18', bold: true, italic: false },
+                              'legend': { position: 'top', alignment: 'end' },
+                              'hAxis': {'title': 'Date', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
+                              'vAxis': {'title': 'Number of Visits', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
                              // 'width':800,
                              'height': 400,
-                             'seriesType': 'bars'
+                             'isStacked': true,
+                             'seriesType': 'bars',
+                             'colors':['blue','red']
                          };
               // Instantiate and draw our chart, passing in some options.
               var chart = new google.visualization.ComboChart(document.getElementById('chart'));

@@ -48,7 +48,7 @@ a.article-title:hover {
 
 .article-content {
   white-space: pre-line;
-  text-align: center;
+  text-align: left;
 }
 
 .article-img {
@@ -102,7 +102,6 @@ ul li.inline{
   width:800;
   height:600;
 }
-
 
 .footer {
     position: fixed;
