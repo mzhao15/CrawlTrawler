@@ -11,10 +11,7 @@
 				  <a id="user" href="#">User</a>
 			  </li>
 			  <li class="list-group-item text-primary list-group-item-light">
-				  <a id="crawler" href="#">Web Crawler</a>
-			  </li>
-			  <li class="list-group-item text-primary list-group-item-light">
-				  <a href="#">Compare</a>
+				  <a id="combo" href="#">Compare</a>
 			  </li>
 			  <li class="list-group-item text-primary list-group-item-light">
 				  <a href="#">FAQ</a>
@@ -57,16 +54,18 @@
 			data.addColumn('string', 'Date');
 			data.addColumn('number', '# of visits');
 			data.addRows([
-			  ['2016-01-01', 3],
-			  ['2016-01-02', 1],
-			  ['2016-01-03', 1],
-			  ['2016-01-04', 1],
-			  ['2016-01-05', 2]
+			  ['2016-01-01', 1000],
+			  ['2016-01-02', 500],
+			  ['2016-01-03', 700],
+			  ['2016-01-04', 100],
+			  ['2016-01-05', 2000]
 			]);
 
 			// Set chart options
 			var options = {'title':'Example',
-			               // 'width':800,
+                            'legend': 'none',
+                            'hAxis': {'title': 'Date', textPosition: 'none', titleTextStyle:{fontSize: '18', bold: true,italic: false}},
+                            'vAxis': {'title': 'Number of Visits', titleTextStyle:{fontSize: '18', bold: true,italic: false}},
 			               'height':400};
 
 			// Instantiate and draw our chart, passing in some options.
@@ -88,5 +87,5 @@
 </div>
 <script src="../static/js/total.js"></script>
 <script src="../static/js/user.js"></script>
-<script src="../static/js/crawler.js"></script>
+<script src="../static/js/combo.js"></script>
 {% endblock content %}

@@ -23,9 +23,10 @@ $(document).ready(function(){
                   row.num_of_visits
                   ]);
               });
-              var options = {'title':'Total Visits',
+              var options = {'title':'User Visits',
                              // 'width':800,
-                             'height':400};
+                             'height':400
+                         };
               // Instantiate and draw our chart, passing in some options.
               var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
               chart.draw(data, options);

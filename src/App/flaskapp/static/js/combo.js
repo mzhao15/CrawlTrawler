@@ -1,10 +1,10 @@
 
 $(document).ready(function(){
-    $("#crawler").click(function(){
+    $("#combo").click(function(){
         var cik = $("#cik").val();
         var startdate = $("#startdate").val();
         var enddate = $("#enddate").val();
-        var disp = "crawler";
+        var disp = "combo";
         $.getJSON("/getdata", { 'cik': cik, 'start_date': startdate, 'end_date': enddate, 'disp_name': disp })
         .done(function (jsonData){
             console.log(jsonData)
@@ -15,19 +15,23 @@ $(document).ready(function(){
             function drawJson(jsonData) {
               var data = new google.visualization.DataTable();
               data.addColumn('string', 'visit_date');
-              data.addColumn('number', 'num_of_visits');
+              data.addColumn('number', 'total_visits');
+              data.addColumn('number', 'human_visits');
 
               jsonData.forEach(function (row) {
                 data.addRow([
                   row.visit_date,
-                  row.num_of_visits
+                  row.total_visits,
+                  row.human_visits
                   ]);
               });
-              var options = {'title':'Web Crawler Visits',
+              var options = {'title': 'Comparison',
                              // 'width':800,
-                             'height':400};
+                             'height': 400,
+                             'seriesType': 'bars'
+                         };
               // Instantiate and draw our chart, passing in some options.
-              var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+              var chart = new google.visualization.ComboChart(document.getElementById('chart'));
               chart.draw(data, options);
             }
         });

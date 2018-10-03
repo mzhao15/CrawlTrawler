@@ -29,9 +29,15 @@ cik = '1542574.0'
 start_date = '2016-01-01'
 end_date = '2016-01-09'
 # Execute command to query the table.
-cur.execute("SELECT DISTINCT visit_date, num_of_visits FROM total WHERE cik=%s AND (visit_date BETWEEN %s AND %s) ORDER BY visit_date;",
-            (cik, start_date, end_date))
-# cur.execute("SELECT * FROM human_visits WHERE num_of_visits > 100;")
+# cur.execute("SELECT DISTINCT visit_date, num_of_visits FROM total WHERE cik=%s AND (visit_date BETWEEN %s AND %s) ORDER BY visit_date;",
+#             (cik, start_date, end_date))
+cur.execute("SELECT t.visit_date AS visit_date, \
+                    t.num_of_visits AS total_visits, \
+                    h.num_of_visits AS human_visits \
+            FROM total t JOIN human AS h \
+            ON t.cik=h.cik AND t.visit_date=h.visit_date \
+            WHERE t.cik=%s AND (t.visit_date BETWEEN %s AND %s) \
+            ORDER BY visit_date;", (cik, start_date, end_date))
 # After executing the query, need to define a list to put the results in: rows
 # rows = cur.fetchall()
 # print(type(rows))
@@ -48,7 +54,7 @@ def myconverter(realdate):
         return realdate.__str__()
 
 
-print(json.dumps(cur.fetchall(), default=myconverter))
+print(json.dumps(cur.fetchall(), indent=2, default=myconverter))
 
 # Execute a command: drop a table
 # cur.execute("DROP TABLE IF EXISTS test")

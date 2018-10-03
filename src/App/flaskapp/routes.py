@@ -52,14 +52,11 @@ def getdata():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     disp = request.args.get('disp_name')
+    if '.' not in cik:
+        cik += '.0'
     # cik = '1542574.0'
     # start_date = '2016-01-01'
     # end_date = '2016-01-09'
-
-    if start_date < '2016-01-01':
-        flash("Start date needs to be later than 2016-01-01")
-        return render_template('charts.html')
-
     try:
         conn = psycopg2.connect(**params)
     except Exception as er:
@@ -67,15 +64,27 @@ def getdata():
         print(str(er))
 
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    if disp == 'total':
-        cur.execute("SELECT DISTINCT visit_date, num_of_visits FROM total \
-          WHERE cik=%s AND (visit_date BETWEEN %s AND %s);", (cik, start_date, end_date))
-    elif disp == 'human':
-        cur.execute("SELECT DISTINCT visit_date, num_of_visits FROM human \
-          WHERE cik=%s AND (visit_date BETWEEN %s AND %s);", (cik, start_date, end_date))
-    elif disp == 'crawler':
-        pass
 
+    if disp == 'total':
+        cur.execute("SELECT visit_date, \
+                            num_of_visits \
+                       FROM total \
+                      WHERE cik=%s AND (visit_date BETWEEN %s AND %s) ORDER BY visit_date;",
+                    (cik, start_date, end_date))
+    elif disp == 'human':
+        cur.execute("SELECT visit_date, \
+                            num_of_visits \
+                       FROM human \
+                      WHERE cik=%s AND (visit_date BETWEEN %s AND %s) ORDER BY visit_date;",
+                    (cik, start_date, end_date))
+    else:
+        cur.execute("SELECT t.visit_date AS visit_date, \
+                            t.num_of_visits AS total_visits, \
+                            h.num_of_visits AS human_visits \
+                       FROM total t JOIN human AS h \
+                         ON t.cik=h.cik AND t.visit_date=h.visit_date \
+                      WHERE t.cik=%s AND (t.visit_date BETWEEN %s AND %s) \
+                   ORDER BY visit_date;", (cik, start_date, end_date))
     jsonData = json.dumps(cur.fetchall(), default=dateserializer)
     cur.close()
     conn.close()

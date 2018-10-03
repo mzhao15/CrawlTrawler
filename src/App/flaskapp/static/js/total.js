@@ -24,9 +24,14 @@ $(document).ready(function(){
                   ]);
               });
               var options = {'title':'Total Visits',
+                             'titleTextStyle': { fontName: 'Times-Roman', postition: 'center', fontSize: '18', bold: true, italic: false },
                              'legend': 'none',
+                             'hAxis': {'title': 'Date', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
+                             'vAxis': {'title': 'Number of Visits', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
+                             'colors': ['red'],
                              // 'width':800,
-                             'height':400};
+                             'height':400
+                         };
               // Instantiate and draw our chart, passing in some options.
               var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
               chart.draw(data, options);
