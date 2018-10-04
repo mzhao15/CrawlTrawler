@@ -88,9 +88,6 @@ def getdata():
                    ORDER BY visit_date;", (cik, start_date, end_date))
 
     raw = cur.fetchall()
-    # if not raw:
-    #     flash('no data')
-    #     return render_template('home.html')
     # data type: json
     jsonData = json.dumps(raw, default=dateserializer)
     cur.close()
