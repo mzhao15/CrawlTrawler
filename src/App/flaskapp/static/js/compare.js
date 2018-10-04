@@ -48,7 +48,7 @@ $(document).ready(function(){
                                      'height': 400,
                                      'isStacked': true,
                                      'seriesType': 'bars',
-                                     'colors':['blue','red']
+                                     'colors':['green','red']
                                  };
                       // Instantiate and draw our chart, passing in some options.
                       var chart = new google.visualization.ComboChart(document.getElementById('chart'));

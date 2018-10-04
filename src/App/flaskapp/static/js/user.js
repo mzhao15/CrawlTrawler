@@ -42,7 +42,7 @@ $(document).ready(function(){
                                       'legend': 'none',
                                       'hAxis': {'title': 'Date', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
                                       'vAxis': {'title': 'Number of Visits', titleTextStyle:{fontName: 'Times-Roman',fontSize: '15', bold: false, italic: false}},
-                                      'colors': ['red'],
+                                      'colors': ['green'],
                                      // 'width':800,
                                      'height':400
                                  };

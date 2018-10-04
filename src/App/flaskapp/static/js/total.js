@@ -51,7 +51,7 @@ $(document).ready(function(){
                       var chart = new google.visualization.ColumnChart(document.getElementById('chart'));
                       chart.draw(data, options);
                     }
-                }    
+                }
             })
             .fail(function(){
                 console.log( "error" );

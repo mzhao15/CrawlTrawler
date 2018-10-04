@@ -1,6 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>Please come back later</h2>
+<h2 id='airflow'>Airflow Job Status</h2>
+<div id="status">
+      Hello. Here you can see random numbers after every 6 sec
+</div>
+
+<script type="text/javascript">
+function call_status(){
+     // var ran = Math.random();
+     // jQuery('#status').html(ran);
+     var dagid = "mybatch_scheduler";
+     var taskid = "finding_2016-04-16";
+     var airflowAPI = "http://ec2-18-235-119-208.compute-1.amazonaws.com:8081/api/experimental/dags/mybatch_scheduler/tasks/finding_2016-04-01";
+     $.ajax({
+        url: airflowAPI,
+        dataType: "json",
+        success: function(msg) {
+            console.log('Successfully started the dag');
+            jQuery('#status').html(msg);
+        },
+        error: function(e){
+           console.log('Failed to start the dag');
+        }
+    });
+}
+
+window.setInterval(function(){
+       /// call your function here
+      call_status();
+}, 6*1000);
+</script>
 
 {% endblock content %}
