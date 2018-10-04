@@ -1,13 +1,6 @@
-# Insight-Meng
-
-This data engineering project built a data pipeline to batch process the EDGAR (Electronic Data Gathering, Analysis and Retrieval system) log files to monitor the most downloaded financial documents from companies.
-
-Background
-U.S. Securities and Exchange Commission (www.sec.gov) requires all companies to file registration statements and periodic reports which are available to public. The Division of Economic and Risk Analysis (DERA) has assembled information on internet search traffic for EDGAR filings through SEC.gov generally covering the period February 14, 2003 through June 30, 2017. By analyzing this datset, we can suggest the average users the 'hot' companies based on the number of visits to their filings in SEC.
-
-Data Engineering Challenge
-Data is not always clean as expected. There are noise and also fake (or even wrong) data in the raw datasets. In this project, we identify the web crawler IPs and filter these IPs, then perform batch processing to find the top visited companies everyday.
-
-Data Pipeline
-The pipeline includes two-layer of batch processing. In the first layer, we identify the web crawler IPs and save/update them in Postgres. In the second batch job, we find the top visited companies and output to our database.
-
+<h2><a class="article-title" href="#">Insight Project: CrawlTrawler</a></h2>
+<h5>A tool to seperate bots from real users<h5>
+<p class="article-content">Analyzing the statistics of the users' visits to the websites of companies has been a common tool to understand customers' insterests and trend of products. However, the weblog files and pageview information often include activities from web crawlers (bots) which can mislead companies to draw wrong conclusions and thus make wrong decisions. This insight project aims to help companies identify and filter the web crawler activities, and precisely analyze their customers' behavior.<p>
+<p class="article-content">The dataset used in this study are EDGAR logfiles (millions of records per day) which stores user's access to the financial documents on <a href="https://www.sec.gov/">sec.org</a>. However, this work can be extended to other companies such as e-commerce, digital media and so on, which have larger volume of visits every day.</p>
+<p class="article-content">The data pipeline consists of two batch processings: (a) identifying the robot IPs and (b) filtering the detected robot IPs and calculate the user access statistics. Apache Airflow is employed to schedule and monitor the daily batch jobs. The whole data pipeline is deployed on Amazon Web Services (AWS).</p>
+<img style="max-width:800px;" src="img/data_pipeline.png"
