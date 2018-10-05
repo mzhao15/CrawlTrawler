@@ -6,10 +6,10 @@
     pip install psycopg2-binary
     ```
 3. find all the connection parameters
-    master-username,
-    password,
-    endpoint,
-    port (5432)
+    - master-username,
+    - password,
+    - endpoint,
+    - port (5432)
 4. run the following example python codes
     ```python
     import psycopg2
