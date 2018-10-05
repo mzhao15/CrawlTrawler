@@ -8,8 +8,8 @@ The dataset used in this study are EDGAR logfiles (millions of records per day) 
 
 
 The data pipeline consists of two batch processes:
-- (a) identifying the robot IPs
-- (b) filtering the detected robot IPs and calculate the user access statistics.
+1. identifying the robot IPs
+2. filtering the detected robot IPs and calculate the user access statistics.
 
 
 Apache Airflow is employed to schedule and monitor the daily batch jobs. The whole data pipeline is deployed on Amazon Web Services (AWS).
