@@ -8,19 +8,19 @@
     ```
     pip install apache-airflow --user
     ```
-(add '--user' if there is a permission issue)
+  (add '--user' if there is a permission issue)
 - check installation
     ```
     airflow version
     ```
-- change the default timezone in "airflow.cfg" (optional)
+- change the default timezone in `airflow.cfg` (optional)
     ```
     default_timezone = est
     ```
 
 
-### Run airflow DAGs
-- move the python script to $AIRFLOW_HOME/dags/
+### Run Airflow DAGs
+- move the python script to `$AIRFLOW_HOME/dags/`
 - execute the python script
     ```
     python example.py
