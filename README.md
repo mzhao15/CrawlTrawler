@@ -43,7 +43,7 @@ Individual spark-batch job can be submitted with instructions in [docs/spark.txt
 3. ```./Total.sh```
 
 ## Run Airflow
-The [Apache Airflow](https://airflow.apache.org/) can be installed on master node following instructions in [docs/airflow.txt](docs/airflow.txt) to install Airflow. Run airflow jobs:
+The [Apache Airflow](https://airflow.apache.org/) can be installed on master node following instructions in [docs/airflow.md](docs/airflow.md) to install Airflow. Run airflow jobs:
 ```
 cd src/Airflow/
 ./batch_scheduler.sh
