@@ -24,6 +24,7 @@
         conn = psycopg2.connect(**params)
     except Exception as er:
         print(str(er))
+    cur = conn.cursor()
     # create table
     cur.execute("CREATE TABLE IF NOT EXISTS test (id serial PRIMARY KEY, num integer, data varchar);")
     # insert a row
