@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta
 
 '''
-create a dataset large than 5 GB for test
+create a dataset large than 10 GB for test
 '''
 
 output_filename = 'log20150101.csv'

@@ -1,0 +1,24 @@
+Run spark jobs on cluster, assuming necessary packages have been installed on cluster
+
+1. start cluster
+    source ~/.bash_profile
+    peg start <cluster-name>
+2. start hadoop and spark on the cluster
+    peg service <cluster-name> hadoop start
+    peg service <cluster-name> spark start
+3. ssh to cluster master node
+    peg ssh <cluster-name> <master-node-number>
+4. pip install pyspark if not installed
+5. move the python scripts to folder
+    cp python_code.py /usr/local/spark/bin
+6. change working directory
+    cd /usr/local/spark/bin
+7. use the spark-shell 'pyspark' to evaluate the code logic (optional)
+8. submit spark jobs:
+    spark-submit --master spark://<cluster-master-node-private-IP:7077>  \
+                 --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.2.0 \
+                 --driver-memory 4G \
+                 --executor-memory 4G \
+                 python_code.py argument1 argument2 ...
+9. use spark webUI to monitor the jobs. open a browser, enter endpoint url: <mater-node public dns>:8080 or 4040
+10. make sure aws ec2 security group inbound policy allows visits from ports 7077,4040,8080....

@@ -6,8 +6,9 @@ from psycopg2 import extras
 from params import pql_params
 
 '''
-this batch job is to get the number of visits by human and robot to each company
-argument (date of the log file), example: 2016-01-01
+this batch job is to get statistics of visits to each CIK by human and total visits
+need one argument (date of the log file), example: "2016-01-01"
+
 csv file column names:
     'ip', 'date', 'time', 'zone', 'cik', 'accession', 'extention', 'code',
     'size','idx', 'norefer', 'noagent', 'find', 'crawler', 'browser'
@@ -15,7 +16,9 @@ csv file column names:
 
 
 def batch_insert(table_name, records):
-    ''' insert processed records into tables in batch '''
+    '''
+    insert processed records into tables in batch
+    '''
     try:
         db_conn = psycopg2.connect(**pql_params)
     except Exception as er1:
@@ -57,7 +60,9 @@ class CountVisits:
         self.db_conn.close()
 
     def get_robot_ip(self):
-        ''' get the list of robot ips from database'''
+        '''
+        get the list of robot IPs from TABLE "robot_ip"
+        '''
         ip_list = []
         self.cur.execute("SELECT ip FROM robot_ip WHERE detected_date=%s;", (self.date,))
         # self.cur.execute("SELECT ip FROM robot_ip;")
@@ -67,7 +72,9 @@ class CountVisits:
         return ip_list
 
     def create_table(self, table_name):
-        ''' create a table named as table_name, table schema is predefined '''
+        '''
+        create a table named as table_name, table schemas are defined in docs/schema.txt
+        '''
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS {} (id serial PRIMARY KEY, \
                                     visit_date date, \
@@ -77,9 +84,11 @@ class CountVisits:
         return
 
     def count_percompany_perIP(self):
-        ''' get the number of visits to each company by each IP
-            input: the parsed raw data: self.data
-            output: (ip+date+cik, count) '''
+        '''
+        get the number of visits to each CIK by each IP
+        input: the parsed raw data: self.data
+        output: ("ip+date+cik", count)
+        '''
         return self.data.map(lambda line: (','.join((line[0], line[1], line[4])), 1)) \
             .reduceByKey(lambda v1, v2: v1+v2)
 
@@ -88,7 +97,7 @@ class CountVisits:
         get the total visits to each company's documents per day
         '''
         def insert(records):
-            ''' insert processed records into "total" in batch '''
+            ''' insert processed records into TABLE "total" in batch '''
             batch_insert('total', records)
 
         count_percompany_perIP.map(lambda count: (count[0].split(','), count[1])) \
@@ -100,13 +109,14 @@ class CountVisits:
 
     def human_visit(self, count_percompany_perIP):
         '''
-        get the number of visits to each company's documents per day by humans only
+        get the number of visits to each CIK per day by human only
         '''
         def insert(records):
             batch_insert('human', records)
 
         filters = self.robot_ip_list
-        # count the number of visits by humans to each company
+
+        # first filter the robot_IPs and then count the number of visits by human
         count_percompany_perIP.map(lambda count: (count[0].split(','), count[1])) \
             .map(lambda count: (count[0][0], count[0][1], count[0][2], count[1])) \
             .filter(lambda line: line[0] not in filters) \
@@ -118,8 +128,8 @@ class CountVisits:
 
     def run(self):
         '''
-        get the total number of visits to each company
-        get the total number of visits by human to each company
+        get the total number of visits to each CIK
+        get the number of visits by human to each CIK
         '''
         count_percompany_perIP = self.count_percompany_perIP()
         self.total_visit(count_percompany_perIP)

@@ -7,8 +7,12 @@ from datetime import datetime, timedelta
 from params import pql_params
 
 '''
-this batch job is to identify the web crawler robot IPs
-argument (date of the log file), example: 2016-01-01
+this batch job is to identify the web crawler IPs
+need one argument (date of the log file), example: "2016-01-01"
+
+input csv file column names:
+    'ip', 'date', 'time', 'zone', 'cik', 'accession', 'extention', 'code',
+    'size','idx', 'norefer', 'noagent', 'find', 'crawler', 'browser'
 '''
 
 
@@ -22,7 +26,7 @@ class CrawlerIPFinder:
         self.data = raw.map(lambda line: str(line).split(',')) \
             .filter(lambda x: x[0] != 'ip')
         self.date = date
-        # connection on the master node to create table and remove old records
+        # database connection on the master node to create table and remove old records
         try:
             self.db_conn = psycopg2.connect(**pql_params)
         except Exception as er1:
@@ -59,7 +63,7 @@ class CrawlerIPFinder:
 
     def percompanypermin(self):
         '''
-        coun the number of visits to each company per minute by each IP
+        coun the number of visits to each CIK per minute by each IP
         return ('ip,datetime,cik', count)    Note: datetime='year-month-day-hour-minute'
         '''
         return self.data.map(lambda line: (line[0], line[1], line[2].split(':'), line[4])) \
@@ -71,7 +75,7 @@ class CrawlerIPFinder:
     def permin(self, rdd):
         '''
         input from self.percompanypermin()
-        count the number of visits per minute by each IP
+        count the number of visits by each IP in one minute
         return ('ip+datetime', count)   Note: datetime='year-month-day-hour-minute'
         '''
         return rdd.map(lambda line: (line[0].split(','), line[1])) \
@@ -81,7 +85,7 @@ class CrawlerIPFinder:
     def get_totalcompanypermin(self, rdd):
         '''
         input from self.percompanypermin()
-        find IPs which visit more than 3 companies per minute
+        find IPs which visit more than 3 companies in one minute
         '''
         return rdd.filter(lambda count: count[1] > 3) \
             .map(lambda count: count[0].split(',')) \
@@ -90,7 +94,7 @@ class CrawlerIPFinder:
     def get_totalvisitpermin(sefl, rdd):
         '''
         input from self.permin()
-        find IPs which visits more than 25 items per minute
+        find IPs which visit more than 25 items in one minute
         '''
         return rdd.filter(lambda count: count[1] > 25) \
             .map(lambda count: count[0].split(',')) \
@@ -109,9 +113,12 @@ class CrawlerIPFinder:
 
     def run(self):
         '''
-        save all the detected robot IPs to the database with the detected date
+        save all the detected robot IPs to the database with the detected dates
         '''
         def insert(records):
+            '''
+            connect to database from workers; insert detected IPs in batch
+            '''
             try:
                 db_conn = psycopg2.connect(**pql_params)
             except Exception as er2:
@@ -127,12 +134,16 @@ class CrawlerIPFinder:
             cur.close()
             db_conn.close()
 
-        # clear old robot IPs and duplicated robot IPs
+        # clear old robot IPs and duplicate robot IPs
         self.deleteIPs()
-        cachedrdd = self.percompanypermin()
-        newcachedrdd = self.permin(cachedrdd)
-        self.get_totalcompanypermin(cachedrdd).union(self.get_totalvisitpermin(newcachedrdd)) \
-            .union(self.get_totalvisitperday(newcachedrdd)).distinct().foreachPartition(insert)
+        rdd_percompany_permin = self.percompanypermin()
+        rdd_permin = self.permin(rdd_percompany_permin)
+        # collect all robot IPs, but only save distinct ones to database
+        self.get_totalcompanypermin(rdd_percompany_permin) \
+            .union(self.get_totalvisitpermin(rdd_permin)) \
+            .union(self.get_totalvisitperday(rdd_permin)) \
+            .distinct() \
+            .foreachPartition(insert)
 
 
 if __name__ == "__main__":

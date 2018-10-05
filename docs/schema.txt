@@ -1,22 +1,22 @@
 PostgreSQL table schemas:
 
-''' table for all detected robot IPs '''
-1. robot_ip(
+// table for all detected robot IPs
+    robot_ip(
     id: serial PRIMARY KEY,
     detected_date: yy-mm-dd,
     ip: varchar(20)
 )
 
-''' table for total visits to each company '''
-2. total(
+// table for total visits to each cik every day
+    total(
     id: serial primary key,
     visit_date: yy-mm-dd,
     cik: varchar(50),
     num_of_visits: int
 )
 
-''' table for visits to each company by humans only '''
-2. human(
+// table for visits to each cik by humans every day
+    human(
     id: serial primary key,
     visit_date: yy-mm-dd,
     cik: varchar(50),

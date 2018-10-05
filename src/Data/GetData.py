@@ -2,7 +2,15 @@ import os
 import sys
 from glob import glob
 
-# sys.argv[1] = filename with extension: 2016.txt
+'''
+- download data from sec.gov using "wget + url"
+- unzip the files
+- move unzipped files to S3 buckect "my-insight-data/logfiles+year"
+
+require one argument such as '2016.txt'
+need to configure aws credentials before running this script
+'''
+
 urls_path = sys.argv[1]
 with open(urls_path, 'r') as urls:
     for url in urls:
