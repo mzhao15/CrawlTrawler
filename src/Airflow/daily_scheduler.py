@@ -26,13 +26,13 @@ dag = DAG('daily_scheduler', default_args=default_args, schedule_interval=timede
 
 task1 = BashOperator(
     task_id='finding',
-    bash_command='cd /home/ubuntu/Insight-Meng/src/Spark/; /CrawlerFinder.sh {{ ds }} ',
+    bash_command='cd /home/ubuntu/Insight-Meng/src/Spark/; ./CrawlerFinder.sh {{ ds }} ',
     dag=dag)
 
 # second task: sparkbatch_Total.py
 task2 = BashOperator(
     task_id='counting',
-    bash_command='cd /home/ubuntu/Insight-Meng/src/Spark/; /Total.sh {{ ds }} ',
+    bash_command='cd /home/ubuntu/Insight-Meng/src/Spark/; ./Total.sh {{ ds }} ',
     dag=dag)
 
 # task2 executes only when task1 finishes
