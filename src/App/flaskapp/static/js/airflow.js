@@ -1,5 +1,12 @@
 $(document).ready(function(){
+    $("#dagdate").click(function(){
+        $("#output").val("");
+    });
+    $("#taskname").click(function(){
+        $("#output").val("");
+    });
     $("#submit").click(function(){
+        $("#output").val("");
         var dagdate = $("#dagdate").val();
         var taskname = $("#taskname").val();
         console.log(taskname);
