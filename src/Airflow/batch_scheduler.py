@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 
 '''
-DAG used to run spark jobs
+DAG used to run spark jobs in a year of 2016
 '''
 
 # DAG settings
@@ -26,7 +26,7 @@ dag = DAG('mybatch_scheduler', default_args=default_args, schedule_interval=time
 
 parent = None
 taskdate = datetime(2016, 1, 1).date()
-while taskdate < datetime(2016, 1, 11).date():
+while taskdate < datetime(2017, 1, 1).date():
     # first task: sparkbatch_CrawlerFinder.py
     task1 = BashOperator(
         task_id='finding_{}'.format(taskdate),
