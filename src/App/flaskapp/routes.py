@@ -93,3 +93,49 @@ def getdata():
     cur.close()
     conn.close()
     return jsonData
+
+
+@app.route("/getairflow", methods=["GET", "POST"])
+def getairflow():
+    dagdate = request.args.get('dagdate')
+    taskname = request.args.get('taskname')
+    response = {"dagdate": dagdate, "taskname": taskname}
+    try:
+        conn = psycopg2.connect(**params)
+    except Exception as er:
+        print("Unable to connect to the database")
+        print(str(er))
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    markfinding = 0
+    markcounting = 0
+    cur.execute("SELECT id \
+                   FROM human \
+                  WHERE visit_date=%s", (dagdate,))
+    raw = cur.fetchall()
+    if raw:
+        markcounting = 1
+        markfinding = 1
+
+    if taskname == 'finding':
+        if markcounting == 0:
+            cur.execute("SELECT id \
+                           FROM robot_ip \
+                          WHERE visit_date=%s", (dagdate,))
+            raw = cur.fetchall()
+            if raw:
+                markfinding = 1
+
+    if taskname == 'finding':
+        if markfinding == 1:
+            response["status"] = "completed"
+        else:
+            response["status"] = "not completed"
+    else:
+        if markcounting == 1:
+            response["status"] = "completed"
+        else:
+            response["status"] = "not completed"
+    cur.close()
+    conn.close()
+    return json.dumps(response)
