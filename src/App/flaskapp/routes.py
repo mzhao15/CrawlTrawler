@@ -121,7 +121,7 @@ def getairflow():
         if markcounting == 0:
             cur.execute("SELECT id \
                            FROM robot_ip \
-                          WHERE visit_date=%s AND cik=%s", (dagdate, "1542574.0"))
+                          WHERE detected_date=%s AND cik=%s", (dagdate, "1542574.0"))
             raw = cur.fetchall()
             if raw:
                 markfinding = 1
