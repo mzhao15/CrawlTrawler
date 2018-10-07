@@ -2,4 +2,4 @@
 
 cd src/App/
 
-python run.py
+python3 run.py
