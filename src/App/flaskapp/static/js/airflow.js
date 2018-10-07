@@ -12,10 +12,7 @@ $(document).ready(function(){
         console.log(taskname);
 
         if (dagdate < '2016-01-01') {
-            alert('choose a starting date later than 2016-01-01');
-        }
-        else if (dagdate >'2016-12-31') {
-            alert('choose an ending date before 2016-12-31');
+            alert('choose a date later than 2016-01-01');
         }
         else {
             $.getJSON("/getairflow", { 'dagdate': dagdate, 'taskname': taskname })
