@@ -37,10 +37,10 @@ Install following softwares/packages on cluster:
     - ```pip install psycopg2-binary```
 
 ## Run Spark Jobs
-Individual spark-batch job can be submitted with instructions in [docs/spark.txt](docs/spark.txt). Users can also run two spark jobs with following steps (Note: second job cannot start until the first one finishes):
+Individual spark-batch job can be submitted with instructions in [docs/spark.txt](docs/spark.txt). Users can also run two spark jobs with following steps (Note: second job cannot start until the first one finishes. Users need to specifity the date of data to be processed):
 1. ```cd src/Spark/```
-2. ```./CrawlerFinder.sh```
-3. ```./Total.sh```
+2. ```./CrawlerFinder.sh 2016-01-01```
+3. ```./Total.sh 2016-01-01```
 
 ## Run Airflow
 The [Apache Airflow](https://airflow.apache.org/) can be installed on master node following instructions in [docs/airflow.md](docs/airflow.md) to install Airflow. Run airflow jobs:
