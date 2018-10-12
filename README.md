@@ -22,7 +22,7 @@ Apache Airflow is employed to schedule and monitor the daily batch jobs. The who
 Data were downloaded from [sec.org](https://www.sec.gov/dera/data) and then saved in AWS S3 Bucket. Details can be found in [src/Data/](src/Data/). In this project, logfiles in 2016 were processed (in total ~ 600GB).
 
 ## Cluster and Database
-Install and configure [AWS CLI](https://aws.amazon.com/cli/) and [Pegasus](https://github.com/InsightDataScience/pegasus) on your local machine, and clone this repository using ```git clone https://github.com/mzhao15/Insight-Meng```.
+Install and configure [AWS CLI](https://aws.amazon.com/cli/) and [Pegasus](https://github.com/InsightDataScience/pegasus) on your local machine, and clone this repository using ```git clone https://github.com/mzhao15/CrawlTrawler```.
 
 Spin up a spark-cluster using Pegasus with following requirements:
 
